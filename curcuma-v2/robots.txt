@@ -1,0 +1,24 @@
+# robots.txt — Agence Curcuma
+# Placer ce fichier à la RACINE du domaine : https://www.agence-curcuma.ch/robots.txt
+
+User-agent: *
+Allow: /
+
+# Robots des IA génératives — autorisés (visibilité dans ChatGPT, Perplexity,
+# Claude, Gemini…). Pour les bloquer, remplacer « Allow: / » par « Disallow: / ».
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://www.agence-curcuma.ch/sitemap.xml

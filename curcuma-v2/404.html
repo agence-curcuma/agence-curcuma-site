@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr-CH">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Page introuvable | Agence Curcuma</title>
+<!-- Une page d'erreur doit être exclue de l'index : elle n'a aucune valeur
+     de recherche et diluerait la qualité perçue du site. -->
+<meta name="robots" content="noindex, follow" />
+<meta name="theme-color" content="#14213d" />
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="icon" href="/images/favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;800&amp;family=Fraunces:ital,opsz,wght@1,9..144,500&amp;display=swap" rel="stylesheet" />
+<style>
+:root{--navy:#14213d;--yellow:#f2ff49;--cream:#f7f1e3;--ink-soft:#4a5772;
+  --font:'Barlow',system-ui,sans-serif;--serif:'Fraunces',Georgia,serif;--ease:cubic-bezier(.22,1,.36,1);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--cream);color:var(--navy);line-height:1.6;
+  min-height:100vh;display:grid;place-items:center;padding:2rem;text-align:center;overflow-x:hidden;}
+.blob{position:absolute;border-radius:46% 54% 43% 57%/54% 46% 54% 46%;background:var(--yellow);z-index:0;}
+.box{position:relative;z-index:2;max-width:36rem;}
+img{height:76px;width:auto;margin:0 auto 2.5rem;}
+h1{font-size:clamp(2.6rem,9vw,4.6rem);font-weight:800;line-height:1;letter-spacing:-.02em;margin-bottom:1rem;}
+h1 em{font-family:var(--serif);font-style:italic;font-weight:500;}
+p{color:var(--ink-soft);font-size:1.15rem;margin-bottom:2.2rem;}
+.btns{display:flex;flex-wrap:wrap;gap:.8rem;justify-content:center;}
+a.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.95rem 1.7rem;border-radius:999px;
+  font-weight:700;text-decoration:none;border:2px solid transparent;transition:transform .25s var(--ease);}
+a.btn:hover{transform:translateY(-2px);}
+.btn--yellow{background:var(--yellow);color:var(--navy);}
+.btn--ghost{border-color:var(--navy);color:var(--navy);}
+.btn--ghost:hover{background:var(--navy);color:var(--cream);}
+</style>
+</head>
+<body>
+<span class="blob" style="width:320px;height:320px;top:-100px;left:-110px;opacity:.85;" aria-hidden="true"></span>
+<span class="blob" style="width:200px;height:200px;bottom:-60px;right:-50px;opacity:.5;" aria-hidden="true"></span>
+<main class="box">
+  <img src="/images/logo-curcuma-navy.png" alt="Agence Curcuma" width="500" height="150" />
+  <h1>Cette page n'existe <em>plus</em>.</h1>
+  <p>Le lien est peut-être ancien, ou l'adresse comporte une coquille. Le reste du site, lui, est bien là.</p>
+  <div class="btns">
+    <a class="btn btn--yellow" href="/">Retour à l'accueil</a>
+    <a class="btn btn--ghost" href="/formations.html">Voir les formations</a>
+  </div>
+</main>
+</body>
+</html>
