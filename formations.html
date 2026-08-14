@@ -90,8 +90,8 @@ h2 em{font-weight:500;}
 .hdr{position:fixed;inset:0 0 auto 0;z-index:50;padding-block:1rem;transition:background .4s var(--ease),padding .4s var(--ease);}
 .hdr.scrolled{background:rgba(14,24,48,.94);backdrop-filter:blur(10px);padding-block:.55rem;}
 .hdr-in{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;}
-.brand img{height:clamp(29px,3.5vw,41px);width:auto;transition:height .4s var(--ease);}
-.hdr.scrolled .brand img{height:54px;}
+.brand img{height:clamp(44px,5vw,60px);width:auto;transition:height .4s var(--ease);}
+.hdr.scrolled .brand img{height:46px;}
 .nav{display:flex;align-items:center;gap:1.8rem;}
 .nav a{color:var(--cream);font-weight:600;font-size:.98rem;}
 .nav a:hover{color:var(--yellow);}
@@ -286,7 +286,7 @@ h2 em{font-weight:500;}
   .nav{position:fixed;inset:0;flex-direction:column;justify-content:center;gap:1.6rem;background:var(--navy);transform:translateX(100%);transition:transform .4s var(--ease);}
   .nav.open{transform:translateX(0);} .nav a{color:var(--cream);font-size:1.4rem;} .burger{display:flex;}
 }
-:focus-visible{outline:3px solid var(--navy);outline-offset:2px;}
+.totop{position:fixed;right:clamp(1rem,3vw,2rem);bottom:clamp(1rem,3vw,2rem);z-index:70;width:48px;height:48px;border-radius:999px;border:0;cursor:pointer;background:var(--navy);color:var(--yellow);display:grid;place-items:center;opacity:0;visibility:hidden;transform:translateY(12px);transition:opacity .3s var(--ease),transform .3s var(--ease),visibility .3s;box-shadow:0 10px 24px -10px rgba(20,33,61,.5);}.totop.show{opacity:1;visibility:visible;transform:none;}.totop:hover{background:var(--yellow);color:var(--navy);}.totop svg{width:22px;height:22px;} :focus-visible{outline:3px solid var(--navy);outline-offset:2px;}
 .on-navy :focus-visible,.enroll :focus-visible{outline-color:var(--yellow);}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}*{animation-duration:.001ms!important;transition-duration:.001ms!important;}[data-a]{opacity:1!important;transform:none!important;}}
 </style>
@@ -691,7 +691,7 @@ h2 em{font-weight:500;}
       <span>Jura · Suisse romande · <a href="index.html">Accueil</a> · <a href="conditions-generales.html">Conditions générales</a> · <a href="mentions-legales.html">Mentions légales</a></span>
     </div>
   </div>
-</footer>
+</footer> <button class="totop" id="totop" type="button" aria-label="Remonter en haut de la page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
 <script>
 (function(){
@@ -701,7 +701,7 @@ h2 em{font-weight:500;}
 
   /* Header + logo swap + burger */
   var hdr=$('#hdr'),logo=$('#brand-logo');
-  function onScroll(){var s=window.scrollY>40;hdr.classList.toggle('scrolled',s);logo.src=s?'curcuma-v2/images/logo-curcuma-yellow.png':'curcuma-v2/images/logo-curcuma-navy.png';}
+  var totop=$('#totop');function onScroll(){var s=window.scrollY>40;hdr.classList.toggle('scrolled',s);logo.src=s?'curcuma-v2/images/logo-curcuma-yellow.png':'curcuma-v2/images/logo-curcuma-navy.png';if(totop)totop.classList.toggle('show',window.scrollY>400);}if(totop)totop.addEventListener('click',function(){window.scrollTo({top:0,behavior:reduced?'auto':'smooth'});});
   window.addEventListener('scroll',onScroll,{passive:true});onScroll();
   var burger=$('#burger'),nav=$('#nav');
   burger.addEventListener('click',function(){var o=nav.classList.toggle('open');burger.setAttribute('aria-expanded',String(o));});
@@ -730,7 +730,7 @@ h2 em{font-weight:500;}
          Repasser à false pour rouvrir les inscriptions. */
       full:false,
       price:'CHF 1450.–',
-      meta:[{icon:'calendar',label:'21, 22 et 23 octobre 2026'},{icon:'clock',label:'3 jours'},{icon:'tag',label:'CHF 1450.–'},{icon:'meal',label:'Repas de midi et boissons inclus'},{icon:'users',label:'Groupe de 20 max.'},{icon:'target',label:'Aucun prérequis technique'},{icon:'pin',label:'Campus StrateJ · Delémont'}],
+      meta:[{icon:'calendar',label:'21, 22 et 23 octobre 2026'},{icon:'clock',label:'3 jours'},{icon:'tag',label:'CHF 1450.–'},{icon:'meal',label:'Repas de midi et boissons inclus'},{icon:'users',label:'Groupe de 20 max.'},{icon:'target',label:'Aucun prérequis technique'},{icon:'pin',label:'Campus StrateJ · Delémont'},{icon:'tag',label:'Formation certifiante — CREA OMNES Education'}],
       obj:'Comprendre les enjeux de l\'intelligence artificielle générative, maîtriser les principaux outils du marché et savoir les intégrer de manière stratégique et opérationnelle dans vos processus professionnels.',
       note:'Trois jours, aucun prérequis technique : de la théorie à l\'action, avec une mise en pratique à la fin de chaque journée pour ancrer les acquis. Les repas de midi, les boissons et les cafés sont inclus pendant toute la durée de la formation.',
       days:[
