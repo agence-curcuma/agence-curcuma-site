@@ -124,8 +124,8 @@ h2 em{font-weight:500;}
 .hdr{position:fixed;inset:0 0 auto 0;z-index:50;padding-block:1rem;transition:background .4s var(--ease),padding .4s var(--ease);}
 .hdr.scrolled{background:rgba(14,24,48,.94);backdrop-filter:blur(10px);padding-block:.55rem;}
 .hdr-in{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;}
-.brand img{height:clamp(29px,3.5vw,41px);width:auto;transition:height .4s var(--ease);}
-.hdr.scrolled .brand img{height:54px;}
+.brand img{height:clamp(44px,5vw,60px);width:auto;transition:height .4s var(--ease);}
+.hdr.scrolled .brand img{height:46px;}
 .nav{display:flex;align-items:center;gap:1.8rem;}
 .nav a{color:var(--cream);font-weight:600;font-size:.98rem;}
 .nav a:hover{color:var(--yellow);}
@@ -317,7 +317,7 @@ h2 em{font-weight:500;}
   .nav a{color:var(--cream);font-size:1.4rem;}
   .burger{display:flex;}
 }
-:focus-visible{outline:3px solid var(--navy);outline-offset:2px;}
+.totop{position:fixed;right:clamp(1rem,3vw,2rem);bottom:clamp(1rem,3vw,2rem);z-index:70;width:48px;height:48px;border-radius:999px;border:0;cursor:pointer;background:var(--navy);color:var(--yellow);display:grid;place-items:center;opacity:0;visibility:hidden;transform:translateY(12px);transition:opacity .3s var(--ease),transform .3s var(--ease),visibility .3s;box-shadow:0 10px 24px -10px rgba(20,33,61,.5);}.totop.show{opacity:1;visibility:visible;transform:none;}.totop:hover{background:var(--yellow);color:var(--navy);}.totop svg{width:22px;height:22px;} :focus-visible{outline:3px solid var(--navy);outline-offset:2px;}
 .on-navy :focus-visible{outline-color:var(--yellow);}
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto;}
@@ -442,7 +442,7 @@ h2 em{font-weight:500;}
     <div class="hero-grid">
       <div>
         <p class="kicker" data-a style="color:var(--navy);margin-bottom:1rem;">Stratégie de croissance par le lien humain</p>
-        <h1 class="display" data-a data-d="1"><span class="hero__l1">Vous cherchez à intéresser un certain public ?</span><br>Je vous permets de le <span class="hl">rencontrer</span> et de le toucher au cœur.</h1>
+        <h1 class="display" data-a data-d="1"><span class="hero__l1">Vous cherchez à intéresser un certain public ?</span><br>Je vous permets de le <span class="hl">rencontrer</span> et de le <em>toucher au cœur</em>.</h1>
         <p class="lead" data-a data-d="2" style="color:var(--ink-soft);max-width:46ch;">Au lieu d'acheter de la visibilité qui ne convertit pas, je crée les <em>occasions concrètes</em> où votre futur client vous choisit de lui-même — et en parle autour de lui.</p>
         <div class="hero__cta" data-a data-d="3">
           <a class="btn btn--yellow" href="https://zcal.co/agence-curcuma" target="_blank" rel="noopener">Planifier un échange <span class="arw" aria-hidden="true">→</span></a>
@@ -532,7 +532,7 @@ h2 em{font-weight:500;}
       <article class="acard" data-a data-d="1">
         <span class="tag">Vous dirigez une entreprise de service</span>
         <h3>Développer un marché</h3>
-        <p>Votre métier se vend par la confiance, pas par la vitrine. Vous voulez gagner du terrain sans dépendre du hasard ni de la surenchère publicitaire.</p>
+        <p>Votre prestation se vend par la confiance avant tout. Vous voulez gagner du terrain sans dépendre du hasard ni de la surenchère publicitaire.</p>
       </article>
       <article class="acard" data-a data-d="2">
         <span class="tag">Vous portez une association ou une fondation</span>
@@ -659,7 +659,7 @@ h2 em{font-weight:500;}
       <span>Jura · Suisse romande · <a href="mentions-legales.html" style="display:inline;">Mentions légales &amp; confidentialité</a></span>
     </div>
   </div>
-</footer>
+</footer> <button class="totop" id="totop" type="button" aria-label="Remonter en haut de la page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
 <script>
 (function(){
@@ -671,7 +671,7 @@ h2 em{font-weight:500;}
     // logo navy sur crème (repos), logo jaune sur header navy (scrolled)
     logo.src = s ? 'curcuma-v2/images/logo-curcuma-yellow.png' : 'curcuma-v2/images/logo-curcuma-navy.png';
   }
-  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+  window.addEventListener('scroll',onScroll,{passive:true});onScroll(); var totop=document.getElementById('totop'); if(totop){window.addEventListener('scroll',function(){totop.classList.toggle('show',window.scrollY>400);},{passive:true}); totop.addEventListener('click',function(){var rm=matchMedia('(prefers-reduced-motion: reduce)').matches;window.scrollTo({top:0,behavior:rm?'auto':'smooth'});});}
 
   var burger=document.getElementById('burger'),nav=document.getElementById('nav');
   burger.addEventListener('click',function(){
