@@ -701,7 +701,7 @@ h2 em{font-weight:500;}
 
   /* Header + logo swap + burger */
   var hdr=$('#hdr'),logo=$('#brand-logo');
-  function onScroll(){var s=window.scrollY>40;hdr.classList.toggle('scrolled',s);logo.src=s?'images/logo-curcuma-yellow.png':'images/logo-curcuma-navy.png';}
+  function onScroll(){var s=window.scrollY>40;hdr.classList.toggle('scrolled',s);logo.src=s?'curcuma-v2/images/logo-curcuma-yellow.png':'curcuma-v2/images/logo-curcuma-navy.png';}
   window.addEventListener('scroll',onScroll,{passive:true});onScroll();
   var burger=$('#burger'),nav=$('#nav');
   burger.addEventListener('click',function(){var o=nav.classList.toggle('open');burger.setAttribute('aria-expanded',String(o));});
