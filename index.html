@@ -138,6 +138,13 @@ h2 em{font-weight:500;}
    (on exclut le bouton .btn qui garde son propre style contrasté) */
 .hdr:not(.scrolled) .nav a:not(.btn){color:var(--navy);}
 .hdr:not(.scrolled) .burger span{background:var(--navy);}
+/* Menu ouvert : la croix de fermeture se trouve sur le panneau bleu marine,
+   elle doit donc rester crème, sinon elle est invisible. Ce sélecteur compte
+   4 classes contre 3 à la règle ci-dessus, il l'emporte. Même chose pour
+   l'anneau de focus au clavier, bleu marine par défaut. */
+.hdr.nav-open .burger span,
+.hdr.nav-open:not(.scrolled) .burger span{background:var(--cream);}
+.hdr.nav-open .burger:focus-visible{outline-color:var(--yellow);}
 /* le bouton jaune garde TOUJOURS son texte bleu foncé (priorité sur .nav a) */
 .nav a.btn--yellow{color:var(--navy);}
 
