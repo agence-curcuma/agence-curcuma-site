@@ -296,7 +296,13 @@ h2 em{font-weight:500;}
     background:var(--navy-900);transform:translateX(100%);transition:transform .4s var(--ease);
     padding:6rem 2rem 3rem;overflow-y:auto;}
   .nav.open{transform:translateX(0);}
-  .hdr .nav a:not(.btn){color:var(--cream);font-size:1.4rem;}
+  .nav a{font-size:1.4rem;}
+  /* La règle « .hdr:not(.scrolled) .nav a:not(.btn) » (4 classes) colore les
+     liens en bleu marine tant que la page n'est pas défilée. Sur le panneau
+     bleu marine du menu ils devenaient illisibles. Ce sélecteur en compte 5,
+     il l'emporte donc sans ambiguïté. */
+  .hdr.nav-open .nav a:not(.btn),
+  .hdr.nav-open:not(.scrolled) .nav a:not(.btn){color:var(--cream);}
   .burger{display:flex;}
   .brand{position:relative;z-index:56;}
   /* Verrou de défilement : html ET body — l'élément qui défile est html. */

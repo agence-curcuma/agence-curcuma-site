@@ -326,7 +326,13 @@ h2 em{font-weight:500;}
     padding:6rem 2rem 3rem;overflow-y:auto;}
   .nav.open{transform:translateX(0);}
   /* Liens toujours crème sur le panneau, quel que soit l'état de défilement. */
-  .hdr .nav a:not(.btn){color:var(--cream);font-size:1.4rem;}
+  .nav a{font-size:1.4rem;}
+  /* La règle « .hdr:not(.scrolled) .nav a:not(.btn) » (4 classes) colore les
+     liens en bleu marine tant que la page n'est pas défilée. Sur le panneau
+     bleu marine du menu ils devenaient illisibles. Ce sélecteur en compte 5,
+     il l'emporte donc sans ambiguïté. */
+  .hdr.nav-open .nav a:not(.btn),
+  .hdr.nav-open:not(.scrolled) .nav a:not(.btn){color:var(--cream);}
   .burger{display:flex;}
   .brand{position:relative;z-index:56;}   /* logo visible par-dessus le panneau */
   /* Verrou de défilement : html ET body. L'élément qui défile est html, un
@@ -461,7 +467,7 @@ h2 em{font-weight:500;}
     <div class="hero-grid">
       <div>
         <p class="kicker" data-a style="color:var(--navy);margin-bottom:1rem;">Stratégie de croissance par le lien humain</p>
-        <h1 class="display" data-a data-d="1"><span class="hero__l1">Vous cherchez à intéresser un certain public ?</span><br>Je vous permets de le <span class="hl">rencontrer</span> et de le <em>toucher au cœur</em>.</h1>
+        <h1 class="display" data-a data-d="1"><span class="hero__l1">Vous cherchez à débloquer un certain marché ?</span><br>Je vous permets de le <span class="hl">rencontrer</span> et de le <em>toucher au cœur</em>.</h1>
         <p class="lead" data-a data-d="2" style="color:var(--ink-soft);max-width:46ch;">Au lieu d'acheter de la visibilité qui ne convertit pas, je crée les <em>occasions concrètes</em> où votre futur client vous choisit de lui-même — et en parle autour de lui.</p>
         <div class="hero__cta" data-a data-d="3">
           <a class="btn btn--yellow" href="https://zcal.co/agence-curcuma" target="_blank" rel="noopener">Planifier un échange <span class="arw" aria-hidden="true">→</span></a>
