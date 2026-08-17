@@ -283,8 +283,25 @@ h2 em{font-weight:500;}
   .bridge{grid-template-columns:1.5fr auto;}
 }
 @media(max-width:819px){
-  .nav{position:fixed;inset:0;flex-direction:column;justify-content:center;gap:1.6rem;background:var(--navy);transform:translateX(100%);transition:transform .4s var(--ease);}
-  .nav.open{transform:translateX(0);} .nav a{color:var(--cream);font-size:1.4rem;} .burger{display:flex;} .hdr .nav.open a:not(.btn), .hdr:not(.scrolled) .nav.open a:not(.btn){color:var(--cream)!important;}
+  /* ------------------------------------------------------------------------
+     CORRECTIF DU MENU MOBILE — ne pas remettre de « backdrop-filter » ici.
+     Un filtre non nul fait du header le BLOC CONTENEUR de ses descendants en
+     position:fixed. Dès que le défilement ajoutait la classe « scrolled », le
+     menu plein écran se retrouvait donc enfermé dans la hauteur du header :
+     fond bleu réduit à la bande du haut et liens débordant sur la page.
+     ------------------------------------------------------------------------ */
+  .hdr.scrolled{backdrop-filter:none;background:var(--navy-900);}
+  .hdr.nav-open,.hdr.nav-open.scrolled{background:transparent;}
+  .nav{position:fixed;inset:0;z-index:55;flex-direction:column;justify-content:center;gap:1.6rem;
+    background:var(--navy-900);transform:translateX(100%);transition:transform .4s var(--ease);
+    padding:6rem 2rem 3rem;overflow-y:auto;}
+  .nav.open{transform:translateX(0);}
+  .hdr .nav a:not(.btn){color:var(--cream);font-size:1.4rem;}
+  .burger{display:flex;}
+  .brand{position:relative;z-index:56;}
+  /* Verrou de défilement : html ET body — l'élément qui défile est html. */
+  html.nav-lock,body.nav-lock{overflow:hidden;}
+  body.nav-lock .totop{opacity:0;visibility:hidden;}
 }
 .totop{position:fixed;right:clamp(1rem,3vw,2rem);bottom:clamp(1rem,3vw,2rem);z-index:70;width:48px;height:48px;border-radius:999px;border:0;cursor:pointer;background:var(--navy);color:var(--yellow);display:grid;place-items:center;opacity:0;visibility:hidden;transform:translateY(12px);transition:opacity .3s var(--ease),transform .3s var(--ease),visibility .3s;box-shadow:0 10px 24px -10px rgba(20,33,61,.5);}.totop.show{opacity:1;visibility:visible;transform:none;}.totop:hover{background:var(--yellow);color:var(--navy);}.totop svg{width:22px;height:22px;} :focus-visible{outline:3px solid var(--navy);outline-offset:2px;}
 .on-navy :focus-visible,.enroll :focus-visible{outline-color:var(--yellow);}
@@ -700,12 +717,37 @@ h2 em{font-weight:500;}
   var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* Header + logo swap + burger */
-  var hdr=$('#hdr'),logo=$('#brand-logo');
-  var totop=$('#totop');function onScroll(){var s=window.scrollY>40;hdr.classList.toggle('scrolled',s);logo.src=s?'curcuma-v2/images/logo-curcuma-yellow.png':'curcuma-v2/images/logo-curcuma-navy.png';if(totop)totop.classList.toggle('show',window.scrollY>400);}if(totop)totop.addEventListener('click',function(){window.scrollTo({top:0,behavior:reduced?'auto':'smooth'});});
+  var hdr=$('#hdr'),logo=$('#brand-logo'),burger=$('#burger'),nav=$('#nav'),totop=$('#totop');
+  var navOpen=false;
+
+  /* Logo jaune dès que le fond derrière lui est bleu marine : au défilement,
+     mais aussi quand le menu mobile est ouvert. */
+  function paintLogo(){
+    logo.src=(navOpen||window.scrollY>40)?'curcuma-v2/images/logo-curcuma-yellow.png':'curcuma-v2/images/logo-curcuma-navy.png';
+  }
+  function onScroll(){
+    if(totop)totop.classList.toggle('show',window.scrollY>400);
+    /* Menu ouvert : l'état du header est gelé. Sans ce garde-fou, le défilement
+       réintroduit la classe « scrolled » et son flou sous le menu ouvert. */
+    if(navOpen)return;
+    hdr.classList.toggle('scrolled',window.scrollY>40);
+    paintLogo();
+  }
+  function setNav(open){
+    if(open===navOpen)return;
+    navOpen=open;
+    nav.classList.toggle('open',open);
+    hdr.classList.toggle('nav-open',open);
+    document.documentElement.classList.toggle('nav-lock',open);
+    document.body.classList.toggle('nav-lock',open);
+    burger.setAttribute('aria-expanded',String(open));
+    if(open)paintLogo(); else onScroll();
+  }
+  if(totop)totop.addEventListener('click',function(){window.scrollTo({top:0,behavior:reduced?'auto':'smooth'});});
   window.addEventListener('scroll',onScroll,{passive:true});onScroll();
-  var burger=$('#burger'),nav=$('#nav');
-  burger.addEventListener('click',function(){var o=nav.classList.toggle('open');burger.setAttribute('aria-expanded',String(o));});
-  nav.addEventListener('click',function(e){if(e.target.closest('a')){nav.classList.remove('open');burger.setAttribute('aria-expanded','false');}});
+  burger.addEventListener('click',function(){setNav(!navOpen);});
+  nav.addEventListener('click',function(e){if(e.target.closest('a'))setNav(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&navOpen)setNav(false);});
   $('#yr').textContent=new Date().getFullYear();
 
   /* ------------------------------------------------------------------
