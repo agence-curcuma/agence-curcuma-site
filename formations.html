@@ -271,6 +271,19 @@ h2 em{font-weight:500;}
 .efull .bf{display:inline-block;font-weight:800;letter-spacing:.02em;background:var(--yellow);color:var(--navy);padding:.4rem 1rem;border-radius:999px;margin-bottom:1rem;font-size:.85rem;text-transform:uppercase;}
 .efull h3{font-size:clamp(1.6rem,3vw,2.2rem);color:#fff;margin-bottom:.8rem;}
 
+/* Inscriptions fermées + encart « prochaine édition » */
+.eclosed .bf{display:inline-block;font-weight:800;letter-spacing:.06em;background:transparent;color:var(--cream);
+  border:1.5px solid var(--cream-on-navy);padding:.35rem .9rem;border-radius:999px;font-size:.75rem;text-transform:uppercase;}
+.eclosed__txt{color:var(--cream-on-navy);margin:1rem 0 1.8rem;max-width:56ch;}
+.nexted{border:2px solid var(--yellow);border-radius:var(--r-sm);padding:clamp(1.3rem,3.5vw,2.2rem);background:var(--navy-900);}
+.nexted .kicker{color:var(--yellow);margin-bottom:.3rem;}
+.nexted h3{color:#fff;font-size:clamp(1.5rem,3.2vw,2.1rem);font-weight:800;margin-bottom:.6rem;}
+.nexted h3 em{font-family:var(--serif);font-style:italic;font-weight:500;color:var(--yellow);}
+.nexted > p{color:var(--cream-on-navy);max-width:56ch;margin-bottom:1.4rem;}
+.nexted .eok{padding-top:.4rem;}
+.nexted .fg > *{min-width:0;} .nexted .fld input{width:100%;min-width:0;box-sizing:border-box;}
+@media(max-width:520px){.nexted{padding:1.2rem 1rem;}}
+
 /* --- Bridge / footer ------------------------------------------------------ */
 .bridge{display:grid;gap:1.4rem;align-items:center;background:var(--navy);color:var(--cream);border-radius:var(--r);padding:clamp(2rem,5vw,3.2rem);position:relative;overflow:hidden;}
 .bridge h2{color:#fff;} .bridge p{color:var(--cream-on-navy);}
@@ -379,9 +392,9 @@ h2 em{font-weight:500;}
         "category": "Paid",
         "price": "1450",
         "priceCurrency": "CHF",
-        "availability": "https://schema.org/InStock",
+        "availability": "https://schema.org/SoldOut",
         "url": "https://www.agence-curcuma.ch/formations.html#inscription",
-        "validThrough": "2026-10-21",
+        "validThrough": "2026-10-12",
         "description": "CHF 1450.– par personne pour les 3 jours. Repas de midi, boissons et cafés inclus."
       }
     },
@@ -413,7 +426,7 @@ h2 em{font-weight:500;}
       <a href="index.html#methode">La méthode</a>
       <a href="index.html#fondatrice">Qui suis-je</a>
       <a href="formations.html" aria-current="page">Formations</a>
-      <a class="btn btn--yellow" href="#inscription">S'inscrire</a>
+      <a class="btn btn--yellow" href="#inscription">Prochaine édition</a>
     </nav>
   </div>
 </header>
@@ -571,9 +584,9 @@ h2 em{font-weight:500;}
 <section class="pad on-cream" id="inscription">
   <div class="wrap" style="max-width:920px;">
     <div style="margin-bottom:2rem;" data-a>
-      <p class="kicker" style="color:var(--navy);">Réserver ma place</p>
+      <p class="kicker" style="color:var(--navy);">Inscriptions</p>
       <h2>Inscription à la <em>formation</em></h2>
-      <p class="lead" style="margin-top:1rem;color:var(--ink-soft);">Limité à 20 places au maximum pour garder de la pratique et des échanges de qualité.</p>
+      <p class="lead" style="margin-top:1rem;color:var(--ink-soft);">Les inscriptions pour la session d'octobre 2026 sont fermées. La prochaine édition aura lieu au printemps 2027.</p>
     </div>
 
     <div id="enroll-zone" data-a data-d="1">
@@ -656,6 +669,53 @@ h2 em{font-weight:500;}
         <h3>La formation est complète !</h3>
         <p style="color:var(--cream-on-navy);max-width:46ch;margin-inline:auto;">Toutes les places sont réservées. Écrivez-nous pour être prévenu·e de l'ouverture de la prochaine session.</p>
         <p style="margin-top:1.4rem;"><a class="btn btn--yellow" href="mailto:eve@agence-curcuma.ch?subject=Liste%20d'attente%20-%20Formation%20IA">Rejoindre la liste d'attente</a></p>
+      </div>
+    </template>
+
+    <!-- ================================================================
+         INSCRIPTIONS FERMÉES (closed:true dans le bloc FORMATIONS)
+         Remplace le formulaire d'inscription : la session reste affichée
+         avec ses dates, et un encart propose la liste de diffusion de la
+         prochaine édition. L'envoi part vers le même Apps Script avec
+         type:'liste_diffusion' et s'ajoute à la feuille
+         « Liste de diffusion — Formation IA (printemps 2027) ».
+         ================================================================ -->
+    <template id="closed-template">
+      <div class="enroll eclosed">
+        <div class="enroll__h">
+          <strong>Session — IA générative (3 jours)</strong>
+          <span class="enroll__seats">21, 22 et 23 octobre 2026 · Delémont</span>
+        </div>
+        <span class="bf">Inscriptions fermées</span>
+        <p class="eclosed__txt">Les inscriptions pour cette session sont closes.</p>
+
+        <div class="nexted" id="nexted">
+          <p class="kicker">Prochaine édition</p>
+          <h3><em>Printemps 2027</em></h3>
+          <p>Inscrivez-vous à la liste de diffusion pour être tenu·e au courant : vous serez parmi les premiers à connaître les dates et l'ouverture des inscriptions.</p>
+          <form id="list-form" novalidate method="post" action="#">
+            <div class="fg">
+              <div class="fld"><label for="l-prenom">Prénom</label><input id="l-prenom" name="prenom" type="text" autocomplete="given-name" required placeholder="Camille" /></div>
+              <div class="fld"><label for="l-nom">Nom</label><input id="l-nom" name="nom" type="text" autocomplete="family-name" required placeholder="Rossier" /></div>
+              <div class="fld fld--full"><label for="l-email">E-mail</label><input id="l-email" name="email" type="email" autocomplete="email" required placeholder="camille@entreprise.ch" /></div>
+              <div class="fld fld--full"><label for="l-entreprise">Entreprise / activité (facultatif)</label><input id="l-entreprise" name="entreprise" type="text" autocomplete="organization" placeholder="Nom de votre PME" /></div>
+            </div>
+            <div class="hp" aria-hidden="true"><label for="l-site-web">Ne pas remplir</label><input type="text" id="l-site-web" name="site_web" tabindex="-1" autocomplete="off" /></div>
+            <div class="enroll__a">
+              <button type="submit" class="btn btn--yellow" id="list-submit">M'inscrire à la liste <span class="arw" aria-hidden="true">→</span></button>
+              <p class="enroll__note">Uniquement pour vous informer de la prochaine édition. Désinscription sur simple demande. Voir les <a href="mentions-legales.html" style="color:inherit;text-decoration:underline;">mentions légales</a>.</p>
+            </div>
+            <p class="fmsg" id="lmsg" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </template>
+
+    <template id="list-ok-template">
+      <div class="eok">
+        <span class="bf">C'est noté</span>
+        <h3>Vous êtes sur la liste&nbsp;!</h3>
+        <p>Nous vous écrirons dès que les dates de l'édition du printemps 2027 seront fixées, avant l'ouverture publique des inscriptions.</p>
       </div>
     </template>
 
@@ -778,12 +838,17 @@ h2 em{font-weight:500;}
   };
   var FORMATIONS=[
     {
-      id:'ia-generative',tab:'IA générative',badge:'À l\'affiche',status:'active',
+      id:'ia-generative',tab:'IA générative',badge:'Inscriptions fermées',status:'active',
       title:'Optimiser son quotidien avec l\'intelligence artificielle générative',
       /* Passer à true quand les 20 places sont prises : le formulaire est
          alors remplacé par l'encart « Complet » + liste d'attente.
          Repasser à false pour rouvrir les inscriptions. */
       full:false,
+      /* Inscriptions fermées (session d'octobre 2026 annulée, reportée au
+         printemps 2027) : le formulaire est remplacé par l'encart
+         « Inscriptions fermées » + liste de diffusion. Repasser à false
+         pour rouvrir les inscriptions. */
+      closed:true,
       price:'CHF 1450.–',
       meta:[{icon:'calendar',label:'21, 22 et 23 octobre 2026'},{icon:'clock',label:'3 jours'},{icon:'tag',label:'CHF 1450.–'},{icon:'meal',label:'Repas de midi et boissons inclus'},{icon:'users',label:'Groupe de 20 max.'},{icon:'target',label:'Aucun prérequis technique'},{icon:'pin',label:'Campus StrateJ · Delémont'},{icon:'tag',label:'Formation certifiante — CREA OMNES Education'}],
       obj:'Comprendre les enjeux de l\'intelligence artificielle générative, maîtriser les principaux outils du marché et savoir les intégrer de manière stratégique et opérationnelle dans vos processus professionnels.',
@@ -895,6 +960,7 @@ h2 em{font-weight:500;}
     /* Bascule manuelle « full:true » dans le bloc FORMATIONS : ferme le
        formulaire même si le backend est encore joignable. */
     if(f.full){showTpl('#full-template');return;}
+    if(f.closed){setupListe(zone);return;}
     if(!form)return;
     /* renderDetail() peut être rappelé (changement d'onglet) : on ne câble
        les écouteurs qu'une seule fois. */
@@ -1001,6 +1067,58 @@ h2 em{font-weight:500;}
         clearTimeout(guard);
         fail('Une erreur est survenue. Veuillez réessayer ou nous contacter à');
       });
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     INSCRIPTIONS FERMÉES — liste de diffusion de la prochaine édition.
+     Pas de défilement automatique ici : l'encart s'affiche au chargement.
+     ------------------------------------------------------------------ */
+  function setupListe(zone){
+    if(zone.dataset.closed)return;
+    zone.dataset.closed='1';
+    var tpl=$('#closed-template');if(!tpl)return;
+    zone.innerHTML='';zone.appendChild(tpl.content.cloneNode(true));
+    var form=$('#list-form',zone),msg=$('#lmsg',zone),btn=$('#list-submit',zone);
+    if(!form)return;
+    var LABEL='M\'inscrire à la liste <span class="arw" aria-hidden="true">→</span>';
+    var sending=false;
+    function done(){
+      var box=$('#nexted',zone),ok=$('#list-ok-template');
+      if(box&&ok){var k=box.querySelector('.kicker'),h=box.querySelector('h3');
+        box.innerHTML='';if(k)box.appendChild(k);if(h)box.appendChild(h);
+        box.appendChild(ok.content.cloneNode(true));}
+    }
+    function fail(txt){
+      sending=false;
+      if(btn){btn.disabled=false;btn.removeAttribute('aria-busy');btn.innerHTML=LABEL;}
+      msg.className='fmsg err';
+      msg.innerHTML=(txt||'Une erreur est survenue.')+' Écrivez-nous à <a href="mailto:eve@agence-curcuma.ch?subject=Liste%20de%20diffusion%20-%20Formation%20IA" style="color:inherit;text-decoration:underline;">eve@agence-curcuma.ch</a>.';
+    }
+    form.addEventListener('submit',function(e){
+      e.preventDefault();if(sending)return;
+      msg.className='fmsg';msg.textContent='';
+      var prenom=$('#l-prenom',form),nom=$('#l-nom',form),email=$('#l-email',form),hp=$('#l-site-web',form);
+      if(hp&&hp.value){done();return;}
+      var mail=email.value.trim();
+      if(!prenom.value.trim()||!nom.value.trim()||!/^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/.test(mail)){
+        msg.classList.add('err');
+        msg.textContent='Merci de renseigner votre prénom, votre nom et un e-mail valide.';
+        (!prenom.value.trim()?prenom:!nom.value.trim()?nom:email).focus();return;
+      }
+      sending=true;
+      if(btn){btn.disabled=true;btn.setAttribute('aria-busy','true');btn.textContent='Envoi en cours…';}
+      var timedOut=false;
+      var guard=setTimeout(function(){timedOut=true;fail('L\'envoi n\'a pas abouti.');},20000);
+      fetch(GAS_ENDPOINT,{method:'POST',mode:'cors',redirect:'follow',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify({type:'liste_diffusion',prenom:prenom.value.trim(),nom:nom.value.trim(),
+          email:mail,entreprise:(($('#l-entreprise',form)||{}).value||'').trim(),site_web:''})})
+      .then(function(r){return r.json();})
+      .then(function(res){if(timedOut)return;clearTimeout(guard);
+        if(res&&res.status==='LISTE_OK'){done();return;}
+        fail('L\'inscription à la liste n\'a pas pu être enregistrée.');})
+      .catch(function(){if(timedOut)return;clearTimeout(guard);fail('Une erreur est survenue.');});
     });
   }
 

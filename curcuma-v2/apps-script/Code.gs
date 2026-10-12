@@ -54,7 +54,13 @@ var CONFIG = {
   PROMOTION_AUTO  : true,
 
   /* Refuser une 2e inscription avec la même adresse e-mail sur la session. */
-  BLOQUER_DOUBLONS: true
+  BLOQUER_DOUBLONS: true,
+
+  /* --- Liste de diffusion (prochaine édition) --------------------------- */
+  /* Fichier Google Sheets « Liste de diffusion — Formation IA (printemps 2027) »
+     où s'ajoutent les personnes qui demandent à être tenues au courant. */
+  LISTE_SPREADSHEET_ID : '1VgH6zEUHkQyyXOwcIEEbEqvazN1gbKcZPuNT2BI0zgk',
+  LISTE_SHEET_NAME     : 'Liste de diffusion'
 };
 
 /* Statuts — ne pas modifier les chaînes sans mettre à jour la feuille. */
@@ -116,6 +122,11 @@ function doPost(e) {
     /* --- Anti-spam : honeypot rempli => on répond OK sans rien écrire ---- */
     if (nettoyer_(data.site_web)) {
       return json_({ status: 'INSCRIT', message: 'ok' });
+    }
+
+    /* --- Liste de diffusion : pas d'inscription, juste un contact ------- */
+    if (String(data.type || '') === 'liste_diffusion') {
+      return ajouterListeDiffusion_(data);
     }
 
     /* --- Nettoyage + validation ---------------------------------------- */
@@ -187,6 +198,56 @@ function doPost(e) {
     } catch (e2) {}
     return json_({ status: 'ERREUR', message: 'Une erreur est survenue. Veuillez réessayer ou nous contacter.' });
   }
+}
+
+/**
+ * Ajoute une personne à la liste de diffusion de la prochaine édition.
+ * Aucune place, aucun paiement, aucun e-mail à la personne : on écrit la
+ * ligne (sans doublon) et on prévient l'administratrice.
+ */
+function ajouterListeDiffusion_(data) {
+  var p = {
+    prenom     : nettoyer_(data.prenom, 80),
+    nom        : nettoyer_(data.nom, 80),
+    email      : nettoyer_(data.email, 120).toLowerCase(),
+    entreprise : nettoyer_(data.entreprise, 150)
+  };
+  if (!p.prenom) {
+    return json_({ status: 'ERREUR', message: 'Merci d\'indiquer votre prénom.' });
+  }
+  if (!emailValide_(p.email)) {
+    return json_({ status: 'ERREUR', message: 'Adresse e-mail invalide.' });
+  }
+
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(20000)) {
+    return json_({ status: 'ERREUR', message: 'Service momentanément occupé, merci de réessayer.' });
+  }
+  try {
+    var ss = SpreadsheetApp.openById(CONFIG.LISTE_SPREADSHEET_ID);
+    var sh = ss.getSheetByName(CONFIG.LISTE_SHEET_NAME) || ss.getSheets()[0];
+    var dernier = sh.getLastRow();
+    if (dernier >= 2) {
+      var mails = sh.getRange(2, 4, dernier - 1, 1).getValues();
+      for (var i = 0; i < mails.length; i++) {
+        if (String(mails[i][0]).trim().toLowerCase() === p.email) {
+          return json_({ status: 'LISTE_OK', message: 'deja' });
+        }
+      }
+    }
+    sh.appendRow(["'" + horodate_(new Date()), p.prenom, p.nom, p.email, p.entreprise,
+                  'Site — page formations (prochaine édition)', '']);
+  } finally {
+    lock.releaseLock();
+  }
+
+  try {
+    notifierAdmin_('Liste de diffusion — nouvelle personne',
+      p.prenom + ' ' + p.nom + ' <' + p.email + '>' +
+      (p.entreprise ? '\n' + p.entreprise : '') +
+      '\n\nAjoutée à la liste « prochaine édition » de la formation IA.');
+  } catch (e) {}
+  return json_({ status: 'LISTE_OK' });
 }
 
 /**
