@@ -919,9 +919,53 @@ function notifierAdmin_(sujet, corps) {
 }
 
 function envoyer_(to, sujet, corps, pj) {
-  var o = { to: to, subject: sujet, body: corps, name: CONFIG.EXPEDITEUR_NOM, replyTo: CONFIG.REPLY_TO };
+  var o = { to: to, subject: sujet, body: corps, htmlBody: emailHtml_(corps), name: CONFIG.EXPEDITEUR_NOM, replyTo: CONFIG.REPLY_TO };
   if (pj && pj.length) o.attachments = pj;
   MailApp.sendEmail(o);
+}
+
+/**
+ * Version mise en forme de l'e-mail : les adresses techniques (liens
+ * personnels, itinéraire) deviennent des boutons lisibles. Le texte brut
+ * reste joint pour les messageries qui n'affichent pas le HTML.
+ */
+function emailHtml_(corps) {
+  var esc = function (x) { return String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+  var bouton = function (url, label) {
+    return '<a href="' + url.replace(/"/g, '%22') + '" style="display:inline-block;background:#f2ff49;color:#14213d;' +
+      'font-weight:700;text-decoration:none;padding:12px 22px;border-radius:999px;margin:4px 0">' + esc(label) + ' →</a>';
+  };
+  var libelleAction = function (url) {
+    if (url === CONFIG.MAPS) return 'Voir l\'itinéraire';
+    if (/action=reactiver/.test(url)) return 'Réactiver mon inscription';
+    if (/action=choix/.test(url)) return 'Choisir une autre date';
+    if (/action=rembourser/.test(url)) return 'Confirmer mon choix';
+    return 'Ouvrir le lien';
+  };
+  var lignes = String(corps).split('\n'), html = [], i;
+  for (i = 0; i < lignes.length; i++) {
+    var l = lignes[i], seul = l.trim().match(/^(https?:\/\/\S+)$/);
+    var etiquette = l.match(/^(.*?)\s*:\s*(https?:\/\/\S+)$/);
+    if (seul) {
+      var prec = html.length ? html[html.length - 1] : '';
+      var m = prec.match(/^<p[^>]*>→ (.*?)(?: :)?<\/p>$/);
+      if (m) { html.pop(); html.push('<p style="margin:0 0 6px">' + bouton(seul[1], m[1].replace(/&amp;/g, '&')) + '</p>'); }
+      else html.push('<p style="margin:0 0 14px">' + bouton(seul[1], libelleAction(seul[1])) + '</p>');
+    } else if (etiquette && etiquette[1] === 'Itinéraire') {
+      html.push('<p style="margin:0 0 14px">' + bouton(etiquette[2], 'Voir l\'itinéraire') + '</p>');
+    } else if (l.trim() === '') {
+      html.push('');
+    } else {
+      var txt = esc(l).replace(new RegExp(esc(CONFIG.URL_PAGE).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+        '<a href="' + CONFIG.URL_PAGE + '" style="color:#243a63">la page de l\'atelier</a>');
+      html.push('<p style="margin:0 0 4px">' + txt + '</p>');
+    }
+  }
+  var contenu = html.join('\n').replace(/<\/p>\n\n/g, '</p><div style="height:10px"></div>');
+  return '<div style="background:#f7f1e3;padding:24px 12px"><div style="max-width:560px;margin:0 auto;background:#ffffff;' +
+    'border-radius:20px;padding:28px 26px;font-family:Barlow,Arial,Helvetica,sans-serif;font-size:16px;line-height:1.55;color:#14213d">' +
+    contenu + '</div><p style="max-width:560px;margin:12px auto 0;font-family:Arial,sans-serif;font-size:12px;color:#4a5772;text-align:center">' +
+    'Agence Curcuma · Place de la Gare 12 · 2800 Delémont · agence-curcuma.ch</p></div>';
 }
 
 function resumeAdmin_(p, s, statut, actives, ligne) {
