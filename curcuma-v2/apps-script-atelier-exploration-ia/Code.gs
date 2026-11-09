@@ -387,9 +387,12 @@ function emailDateAnnulee_(l, s, motif) {
       '→ Être remboursé·e intégralement (' + montantTexte_() + ') :\n' + lienChoix_(l, 'rembourser') + '\n\n' +
       'Sans nouvelles de votre part, je vous rembourse.\n' + fin;
   } else if (avant === ST.PEC) {
-    corps = debut + 'Vous avez le choix :\n\n' +
-      '→ Reporter votre place sur une autre date, toujours avec votre caisse de chômage :\n' + lienChoix_(l, 'choix') + '\n\n' +
-      '→ Annuler votre inscription :\n' + lienChoix_(l, 'rembourser') + '\n\n' +
+    corps = debut + 'Comme votre participation est prise en charge par votre caisse de chômage (' + (l.caisse || 'votre caisse') + '), ' +
+      'merci de la contacter pour savoir si vous pouvez reporter la formation à une autre date, ou s\'il faut l\'annuler.\n\n' +
+      'Ensuite, indiquez-moi sa réponse en un clic :\n\n' +
+      '→ Ma caisse est d\'accord : je reporte sur une autre date :\n' + lienChoix_(l, 'choix') + '\n\n' +
+      '→ J\'annule mon inscription :\n' + lienChoix_(l, 'rembourser') + '\n\n' +
+      'Le plus souvent, la caisse paie après la formation : dans ce cas, il suffit d\'annuler l\'inscription, rien ne vous sera facturé. ' +
       'Si votre caisse a déjà réglé la facture, je la lui rembourse.\n' + fin;
   } else if (avant === ST.RESERVEE) {
     corps = debut + (l.chomage ? 'Merci de prévenir votre caisse de chômage que cette facture est annulée.\n\n'
@@ -514,7 +517,7 @@ function choisirRemboursement_(code) {
   sh.getRange(l.ligne, COL.STATUT).setValue(ST.ANNULEE);
   tracer_(sh, l.ligne, 'inscription annulée par la personne après annulation de la date');
   notifierAdmin_('Inscription annulée — ' + l.prenom + ' ' + l.nom, l.prenom + ' ' + l.nom + ' (' + l.email + ') ne reporte pas.' +
-    (avant === ST.PEC ? '\nPrise en charge chômage : pense à prévenir la caisse (' + l.caisse + ') si la facture a été réglée.' : ''));
+    (avant === ST.PEC ? '\nPrise en charge chômage (caisse : ' + l.caisse + ') : si la caisse a déjà réglé la facture ' + l.facture + ', rembourse-la ; sinon, rien à faire.' : ''));
   majAgenda_(s.id);
   return pageReponse_('C\'est noté', 'Votre inscription est annulée. J\'espère vous accueillir à une prochaine date !');
 }
