@@ -1,4 +1,4 @@
-# Journée exploration IA — mode d'emploi
+# Atelier Exploration IA — mode d'emploi
 
 Page `journee-ia.html` → Google Apps Script (`Code.gs`) → Google Sheets, Gmail, Agenda, Drive.
 Système séparé de celui de la formation CREA : les deux ne se mélangent pas.

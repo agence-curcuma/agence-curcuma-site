@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- *  AGENCE CURCUMA — Journée IA en petit groupe (Google Apps Script)
+ *  AGENCE CURCUMA — Atelier Exploration IA (Google Apps Script)
  *  Backend de la page journee-ia.html
  *
  *  - reçoit les inscriptions (une date au choix parmi les sessions),
@@ -41,7 +41,7 @@ var CONFIG = {
   CLOTURE_VEILLE_HEURE : '12:00',
   FUSEAU : 'Europe/Zurich',
 
-  TITRE       : 'Journée exploration IA',
+  TITRE       : 'Atelier Exploration IA',
   LIEU_LIGNE1 : 'Au Bévan 11b',
   LIEU_LIGNE2 : '2852 Courtételle',
   URL_PAGE    : 'https://www.agence-curcuma.ch/journee-ia.html',
@@ -57,7 +57,7 @@ var CONFIG = {
   },
   MENTION_TVA : 'Agence Curcuma n\'est pas assujettie à la TVA.',
   PREFIXE_FACTURE : 'JIA',
-  DOSSIER_FACTURES : 'Journée IA — factures',   // dossier Google Drive (créé au besoin)
+  DOSSIER_FACTURES : 'Atelier Exploration IA — factures',   // dossier Google Drive (créé au besoin)
 
   /* --- E-mails ------------------------------------------------------- */
   ADMIN_EMAIL    : 'eve@agence-curcuma.ch',
@@ -203,7 +203,7 @@ function doPost(e) {
     return json_({ status: 'LISTE_ATTENTE' });
 
   } catch (err) {
-    try { notifierAdmin_('⚠️ Erreur inscription Journée IA', String(err) + '\n\n' + (err && err.stack || '')); } catch (e2) {}
+    try { notifierAdmin_('⚠️ Erreur inscription Atelier IA', String(err) + '\n\n' + (err && err.stack || '')); } catch (e2) {}
     return json_({ status: 'ERREUR', message: 'Une erreur est survenue. Veuillez réessayer ou écrire à eve@agence-curcuma.ch.' });
   }
 }
@@ -450,7 +450,7 @@ function onEditInstallable(e) {
       }
     }
   } catch (err) {
-    notifierAdmin_('⚠️ Erreur dans la feuille Journée IA', String(err) + '\n' + (err && err.stack || ''));
+    notifierAdmin_('⚠️ Erreur dans la feuille Atelier IA', String(err) + '\n' + (err && err.stack || ''));
   }
 }
 
@@ -475,8 +475,8 @@ function emailFacture_(l, s, echeance, pdf, promotion) {
   var corps =
     'Bonjour ' + l.prenom + ',\n\n' +
     (promotion
-      ? 'Bonne nouvelle : une place s\'est libérée pour la ' + CONFIG.TITRE + ' du ' + s.label + '. Elle est à vous.\n\n'
-      : 'Merci pour votre inscription à la ' + CONFIG.TITRE + ' du ' + s.label + '.\n\n') +
+      ? 'Bonne nouvelle : une place s\'est libérée pour l\'' + CONFIG.TITRE + ' du ' + s.label + '. Elle est à vous.\n\n'
+      : 'Merci pour votre inscription à l\'' + CONFIG.TITRE + ' du ' + s.label + '.\n\n') +
     infosPratiques_(s) + '\n\n' +
     (l.chomage
       ? 'Vous trouverez la facture en pièce jointe : merci de la transmettre à votre caisse de chômage (' + l.caisse + '). ' +
@@ -496,7 +496,7 @@ function emailFacture_(l, s, echeance, pdf, promotion) {
 function emailConfirmation_(l, s) {
   var corps =
     'Bonjour ' + l.prenom + ',\n\n' +
-    'Votre place à la ' + CONFIG.TITRE + ' est confirmée. Je me réjouis de vous accueillir !\n\n' +
+    'Votre place à l\'' + CONFIG.TITRE + ' est confirmée. Je me réjouis de vous accueillir !\n\n' +
     infosPratiques_(s) + '\n\n' +
     'Le fichier joint ajoute la journée à votre agenda.\n\n' +
     'À prévoir : votre abonnement Claude Pro actif (environ 20 CHF par mois). ' +
@@ -509,7 +509,7 @@ function emailConfirmation_(l, s) {
 function emailListeAttente_(l, s) {
   var corps =
     'Bonjour ' + l.prenom + ',\n\n' +
-    'Merci pour votre intérêt pour la ' + CONFIG.TITRE + ' du ' + s.label + '.\n\n' +
+    'Merci pour votre intérêt pour l\'' + CONFIG.TITRE + ' du ' + s.label + '.\n\n' +
     'Les ' + CONFIG.PLACES_MAX + ' places de cette date sont prises pour l\'instant. Vous êtes inscrit·e en liste d\'attente.\n\n' +
     'Dès qu\'une place se libère, vous la recevez automatiquement, avec la facture, dans l\'ordre d\'arrivée. ' +
     'Aucun paiement ne vous est demandé d\'ici là.\n\n' +
@@ -523,7 +523,7 @@ function emailExpiration_(l) {
   if (!s) return;
   var corps =
     'Bonjour ' + l.prenom + ',\n\n' +
-    'Je n\'ai pas encore reçu votre paiement pour la ' + CONFIG.TITRE + ' du ' + s.label + '. ' +
+    'Je n\'ai pas encore reçu votre paiement pour l\'' + CONFIG.TITRE + ' du ' + s.label + '. ' +
     'Comme une autre personne attendait, la place lui a été proposée et votre inscription passe en liste d\'attente.\n\n' +
     'Si vous venez de payer, pas d\'inquiétude : écrivez-moi en répondant à cet e-mail et nous trouvons une solution ' +
     '(place sur cette date si elle se libère, ou sur une prochaine date).\n\n' +
@@ -534,7 +534,7 @@ function emailExpiration_(l) {
 function notifierAdmin_(sujet, corps) {
   if (!CONFIG.ADMIN_EMAIL) return;
   try {
-    MailApp.sendEmail({ to: CONFIG.ADMIN_EMAIL, subject: '[Journée IA] ' + sujet, body: corps, name: 'Inscriptions Journée IA' });
+    MailApp.sendEmail({ to: CONFIG.ADMIN_EMAIL, subject: '[Atelier IA] ' + sujet, body: corps, name: 'Inscriptions Atelier IA' });
   } catch (e) {}
 }
 
@@ -597,7 +597,7 @@ function majAgenda_(sessionId) {
 function icsBlob_(s) {
   var f = function (d) { return Utilities.formatDate(d, 'UTC', "yyyyMMdd'T'HHmmss'Z'"); };
   var ics = [
-    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Agence Curcuma//Journee IA//FR', 'METHOD:PUBLISH',
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Agence Curcuma//Atelier Exploration IA//FR', 'METHOD:PUBLISH',
     'BEGIN:VEVENT',
     'UID:' + s.id + '@agence-curcuma.ch',
     'DTSTAMP:' + f(new Date()),
@@ -645,7 +645,7 @@ function payloadQr_(d) {
 }
 
 function messageQr_(d) {
-  return ('Journée IA ' + dateCourte_(debutSession_(d.session)) +
+  return ('Atelier IA ' + dateCourte_(debutSession_(d.session)) +
     ' - ' + d.client.prenom + ' ' + d.client.nom + ' - Facture ' + d.numero).substring(0, 140);
 }
 
@@ -1028,7 +1028,7 @@ function colonneEnLettre_(n) { var s = ''; while (n > 0) { var m = (n - 1) % 26;
    ========================================================================== */
 
 function onOpen() {
-  SpreadsheetApp.getUi().createMenu('Journée IA')
+  SpreadsheetApp.getUi().createMenu('Atelier IA')
     .addItem('📊 Voir les places par date', 'actionEtat')
     .addItem('📧 Renvoyer la facture (ligne sélectionnée)', 'actionRenvoyerFacture')
     .addItem('🔄 Vérifier maintenant (échéances, liste d\'attente)', 'verifierEcheances')
