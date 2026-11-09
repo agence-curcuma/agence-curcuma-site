@@ -28,7 +28,7 @@ Vérification automatique toutes les heures.
 
 ### Annuler une date (minimum non atteint, maladie…)
 
-Menu **Atelier IA ▸ ❌ Annuler une date** : choisir la date, puis le motif (OUI = minimum non atteint, NON = empêchement de ta part). Utilisable à tout moment, même la veille.
+Menu **Atelier IA ▸ ❌ Annuler une date** : choisir la date, puis le motif (OUI = minimum non atteint, NON = empêchement de ta part). En cas d'empêchement, tu peux écrire une phrase personnelle (facultatif) ajoutée à tous les e-mails, juste après l'annonce. Utilisable à tout moment, même la veille.
 
 - La date est fermée sur le site (« Date annulée »), plus de rappel ni d'e-mail automatique pour elle, l'événement de l'agenda devient « ANNULÉ ».
 - Chaque personne reçoit un e-mail adapté, avec des liens personnels :

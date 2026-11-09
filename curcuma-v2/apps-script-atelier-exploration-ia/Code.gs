@@ -329,14 +329,25 @@ function actionAnnulerDate() {
   if (!s) return alerte_('Numéro inconnu, rien n\'a été annulé.');
   var motif = ui.alert('Motif', 'Le minimum de participant·e·s n\'est-il pas atteint ?\n\nOUI = minimum non atteint\nNON = empêchement de ma part (maladie…)', ui.ButtonSet.YES_NO_CANCEL);
   if (motif === ui.Button.CANCEL || motif === ui.Button.CLOSE) return;
-  var ok = ui.alert('Confirmer', 'Annuler définitivement le ' + s.label + ' et écrire à toutes les personnes inscrites ?', ui.ButtonSet.YES_NO);
+  var message = '';
+  if (motif === ui.Button.NO) {
+    var perso = ui.prompt('Message personnel (facultatif)',
+      'Une phrase ajoutée à l\'e-mail, juste après l\'annonce de l\'annulation.\n' +
+      'Exemple : « Je me suis blessée et ne pourrai pas animer l\'atelier cette semaine. »\n\nLaisse vide pour ne rien ajouter.',
+      ui.ButtonSet.OK_CANCEL);
+    if (perso.getSelectedButton() !== ui.Button.OK) return;
+    message = String(perso.getResponseText() || '').trim();
+  }
+  var ok = ui.alert('Confirmer', 'Annuler définitivement le ' + s.label + ' et écrire à toutes les personnes inscrites ?' +
+    (message ? '\n\nTon message : « ' + message + ' »' : ''), ui.ButtonSet.YES_NO);
   if (ok !== ui.Button.YES) return;
-  var n = annulerDate_(s.id, motif === ui.Button.YES ? 'minimum' : 'empechement');
+  var n = annulerDate_(s.id, motif === ui.Button.YES ? 'minimum' : 'empechement', message);
   alerte_('Le ' + s.label + ' est annulé. ' + n + ' personne(s) prévenue(s). Le récapitulatif t\'a été envoyé par e-mail.');
 }
 
 /** Annule une date, prévient chaque personne concernée, envoie le récapitulatif à Eve. */
-function annulerDate_(sessionId, motif) {
+function annulerDate_(sessionId, motif, message) {
+  message = String(message || '').trim().substring(0, 600);
   var s = trouverSession_(sessionId), props = PropertiesService.getScriptProperties();
   var aEcrire = [];
   avecVerrou_(function () {
@@ -354,11 +365,12 @@ function annulerDate_(sessionId, motif) {
     });
     SpreadsheetApp.flush();
   });
-  aEcrire.forEach(function (l) { try { emailDateAnnulee_(l, s, motif); } catch (e) { notifierAdmin_('⚠️ E-mail d\'annulation non envoyé', l.email + ' : ' + e); } });
+  aEcrire.forEach(function (l) { try { emailDateAnnulee_(l, s, motif, message); } catch (e) { notifierAdmin_('⚠️ E-mail d\'annulation non envoyé', l.email + ' : ' + e); } });
   var groupe = function (st) { return aEcrire.filter(function (l) { return props.getProperty('avant_' + l.code) === st; }); };
   var liste = function (arr) { return arr.map(function (l) { return '· ' + l.prenom + ' ' + l.nom + ' <' + l.email + '>'; }).join('\n') || '—'; };
   notifierAdmin_('❌ Date annulée — ' + s.label,
-    'Le ' + s.label + ' est annulé (' + (motif === 'minimum' ? 'minimum non atteint' : 'empêchement') + '). Chacun·e a reçu un e-mail.\n\n' +
+    'Le ' + s.label + ' est annulé (' + (motif === 'minimum' ? 'minimum non atteint' : 'empêchement') + '). Chacun·e a reçu un e-mail.\n' +
+    (message ? 'Ton message ajouté : « ' + message + ' »\n' : '') + '\n' +
     'Ont payé (choix : report ou remboursement) :\n' + liste(groupe(ST.PAYEE)) + '\n\n' +
     'Prise en charge chômage (choix : report ou annulation) :\n' + liste(groupe(ST.PEC)) + '\n\n' +
     'Paiement pas encore reçu (invité·e·s à ne pas payer, report possible) :\n' + liste(groupe(ST.RESERVEE)) + '\n\n' +
@@ -372,13 +384,14 @@ function lienChoix_(l, option) {
   return ScriptApp.getService().getUrl() + '?action=' + option + '&code=' + encodeURIComponent(l.code);
 }
 
-function emailDateAnnulee_(l, s, motif) {
+function emailDateAnnulee_(l, s, motif, message) {
   var avant = PropertiesService.getScriptProperties().getProperty('avant_' + l.code);
   var raison = motif === 'minimum'
     ? 'le nombre minimum de participant·e·s n\'est pas atteint'
     : 'suite à un empêchement de ma part';
   var debut = 'Bonjour ' + l.prenom + ',\n\n' +
-    'Je suis désolée : l\'' + CONFIG.TITRE + ' du ' + s.label + ' est annulé, ' + raison + '.\n\n';
+    'Je suis désolée : l\'' + CONFIG.TITRE + ' du ' + s.label + ' est annulé, ' + raison + '.\n\n' +
+    (message ? message + '\n\n' : '');
   var fin = '\nUne question ? Répondez simplement à cet e-mail.\n\nAvec mes excuses pour ce changement,\nEve Schaller\nAgence Curcuma';
   var corps;
   if (avant === ST.PAYEE) {
@@ -392,8 +405,7 @@ function emailDateAnnulee_(l, s, motif) {
       'Ensuite, indiquez-moi sa réponse en un clic :\n\n' +
       '→ Ma caisse est d\'accord : je reporte sur une autre date :\n' + lienChoix_(l, 'choix') + '\n\n' +
       '→ J\'annule mon inscription :\n' + lienChoix_(l, 'rembourser') + '\n\n' +
-      'Le plus souvent, la caisse paie après la formation : dans ce cas, il suffit d\'annuler l\'inscription, rien ne vous sera facturé. ' +
-      'Si votre caisse a déjà réglé la facture, je la lui rembourse.\n' + fin;
+      'En cas d\'annulation, si votre caisse a déjà réglé la facture, je la lui rembourse directement.\n' + fin;
   } else if (avant === ST.RESERVEE) {
     corps = debut + (l.chomage ? 'Merci de prévenir votre caisse de chômage que cette facture est annulée.\n\n'
       : 'Merci de ne pas payer la facture reçue. Si vous l\'avez déjà réglée, répondez à cet e-mail : je vous rembourse.\n\n') +
