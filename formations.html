@@ -136,6 +136,36 @@ h2 em{font-weight:500;}
 .ftab .badge{font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:.14rem .5rem;border-radius:999px;background:var(--yellow);color:var(--navy);}
 .ftab.is-soon{opacity:.72;}
 
+/* --- Thèmes + cartes de choix + panneaux dépliables ----------------------- */
+.themes{margin-top:2rem;}
+.themes__l{font-size:.78rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:.7rem;}
+.themes .ftabs{margin-top:0;}
+a.ftab{text-decoration:none;}
+.ftab.is-soon{cursor:default;border-style:dashed;}
+.ftab.is-soon:hover{transform:none;}
+.fchoice{display:grid;gap:1.2rem;grid-template-columns:1fr;}
+@media(min-width:820px){.fchoice{grid-template-columns:1fr 1fr;}}
+.fcard{display:flex;flex-direction:column;gap:.6rem;text-align:left;font-family:var(--font);cursor:pointer;
+  background:var(--cream);color:var(--navy);border:2px solid var(--navy);border-radius:var(--r);padding:clamp(1.4rem,3vw,2rem);
+  transition:transform .25s var(--ease),box-shadow .25s var(--ease),background .25s var(--ease);}
+.fcard:hover{transform:translateY(-3px);box-shadow:0 22px 46px -28px rgba(20,33,61,.45);}
+.fcard__b{align-self:flex-start;font-size:.7rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:var(--yellow);color:var(--navy);padding:.25rem .7rem;border-radius:999px;}
+.fcard__t{font-size:clamp(1.5rem,2.8vw,2.1rem);font-weight:800;line-height:1.08;}
+.fcard__m{font-weight:700;font-size:.95rem;}
+.fcard__d{color:var(--ink-soft);}
+.fcard__c{margin-top:auto;padding-top:.6rem;font-weight:800;text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:.15em;text-underline-offset:.2em;}
+.fcard__c .arw{display:inline-block;transition:transform .25s var(--ease);}
+.fcard[aria-expanded="true"]{background:var(--navy);color:var(--cream);}
+.fcard[aria-expanded="true"] .fcard__d{color:var(--cream-on-navy);}
+.fcard[aria-expanded="true"] .fcard__c .arw{transform:rotate(180deg);}
+html:not(.no-js) .fpanel:not(.is-open){display:none;}
+.ftitle{font-size:clamp(2.3rem,5.2vw,3.8rem);font-weight:800;line-height:1.02;letter-spacing:-.015em;}
+.fsub{margin-top:.8rem;font-size:clamp(1.05rem,1.6vw,1.3rem);color:var(--ink-soft);max-width:44ch;}
+.note .btn{margin-top:.2rem;}
+.ftop{padding-top:clamp(2.5rem,5vw,4rem);}
+#panel-atelier .chip{background:var(--cream);}
+.ftop + #genese{padding-top:clamp(2rem,4vw,3rem);}
+
 /* --- Détail formation ----------------------------------------------------- */
 .fhead{display:grid;gap:1.2rem 2.5rem;grid-template-columns:1fr;align-items:end;margin-bottom:2.5rem;}
 .fmeta{display:flex;flex-wrap:wrap;gap:.7rem;}
@@ -426,7 +456,7 @@ h2 em{font-weight:500;}
       <a href="index.html#methode">La méthode</a>
       <a href="index.html#fondatrice">Qui suis-je</a>
       <a href="formations.html" aria-current="page">Formations</a>
-      <a class="btn btn--yellow" href="#inscription">Prochaine édition</a>
+      <a class="btn btn--yellow" href="#choix">Choisir une formation</a>
     </nav>
   </div>
 </header>
@@ -440,12 +470,86 @@ h2 em{font-weight:500;}
     <p class="kicker" style="color:var(--navy);" data-a>Curcuma Formations</p>
     <h1 class="display" data-a data-d="1">Les outils qui changent votre <span class="hl">quotidien</span>.</h1>
     <p class="lead" data-a data-d="2">Des formations concrètes, pensées pour les PME et les indépendants de Suisse romande. On repart avec des <em>réflexes</em>, pas seulement des notes.</p>
-    <!-- Pré-rendu statique : le JS remplace ce contenu, mais il doit exister
-         dans le HTML pour être indexé et lisible sans JavaScript. -->
-    <div class="ftabs" id="ftabs" role="tablist" aria-label="Choisir une formation" data-a data-d="3"><a class="ftab" href="atelier-exploration-ia.html">Atelier Exploration IA <span class="badge">Nouveau</span></a><button class="ftab" role="tab" aria-selected="true">IA générative <span class="badge">À l'affiche</span></button></div>
+    <!-- THÈMES — ajouter un bouton par nouveau thème (et son bloc #choix-…). -->
+    <div class="themes" data-a data-d="3">
+      <p class="themes__l">Choisir un thème</p>
+      <div class="ftabs" role="tablist" aria-label="Thèmes de formation">
+        <a class="ftab" role="tab" aria-selected="true" href="#choix">Intelligence artificielle</a>
+        <span class="ftab is-soon" aria-disabled="true">D'autres thèmes bientôt</span>
+      </div>
+    </div>
   </div>
 </section>
 
+<!-- ============================ CHOIX (thème IA) ============================
+     Deux formations du thème IA. Un clic sur une carte déplie le détail
+     correspondant juste en dessous ; un second clic le replie. -->
+<section class="pad on-cream" id="choix" aria-label="Formations du thème IA" style="padding-top:clamp(2rem,4vw,3rem);">
+  <div class="wrap">
+    <div style="margin-bottom:1.8rem;" data-a>
+      <p class="kicker" style="color:var(--navy);">Thème · Intelligence artificielle</p>
+      <h2>Quelle formation pour <em>vous</em> ?</h2>
+    </div>
+    <div class="fchoice" data-a data-d="1">
+      <button class="fcard" type="button" aria-expanded="false" aria-controls="panel-atelier" data-panel="atelier">
+        <span class="fcard__b">Nouveau · une fois par mois</span>
+        <span class="fcard__t">Atelier Exploration IA</span>
+        <span class="fcard__m">1 journée · 4 personnes max. · Courtételle · CHF 600.–</span>
+        <span class="fcard__d">Pour découvrir l'IA et repartir avec un usage simple mis en place en direct, pour l'organisation, la bureautique et la communication.</span>
+        <span class="fcard__c">Découvrir l'atelier <span class="arw" aria-hidden="true">↓</span></span>
+      </button>
+      <button class="fcard" type="button" aria-expanded="false" aria-controls="panel-certifiante" data-panel="certifiante">
+        <span class="fcard__b">Certifiée CREA · printemps 2027</span>
+        <span class="fcard__t">Formation certifiante IA générative</span>
+        <span class="fcard__m">2 à 3 jours · jusqu'à 20 personnes · Delémont</span>
+        <span class="fcard__d">Pour les professionnel·le·s qui veulent créer des visuels et des processus de travail avec l'IA générative, avec un expert et conférencier IA.</span>
+        <span class="fcard__c">Découvrir la formation <span class="arw" aria-hidden="true">↓</span></span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ PANNEAU : ATELIER EXPLORATION IA ============================ -->
+<div class="fpanel" id="panel-atelier">
+<section class="pad on-cream-2" aria-label="Atelier Exploration IA">
+  <div class="wrap">
+    <div class="fhead">
+      <div data-a>
+        <p class="kicker" style="color:var(--navy);">Une fois par mois en présentiel</p>
+        <h2 class="ftitle">Atelier Exploration IA</h2>
+        <p class="fsub">Explorer l'IA, puis la mettre en place pour <em>vous</em>.</p>
+      </div>
+      <div class="fmeta" data-a data-d="1">
+        <span class="chip"><span>1 journée · 8h30–17h00</span></span>
+        <span class="chip"><span>4 personnes au maximum</span></span>
+        <span class="chip"><span>CHF 600.–</span></span>
+        <span class="chip"><span>Repas de midi et boissons inclus</span></span>
+        <span class="chip"><span>Au Bévan 11b · Courtételle</span></span>
+      </div>
+    </div>
+    <div class="fintro">
+      <div class="obj" data-a>
+        <p class="kicker">Le déroulé</p>
+        <p><b style="color:#fff;">Le matin, des démonstrations</b> de cas d'usage pour la productivité, la bureautique et la communication. <b style="color:#fff;">L'après-midi, la pratique</b> : on met en place, en direct, un usage concret pour votre quotidien.</p>
+      </div>
+      <div class="note" data-a data-d="1">
+        <p style="margin-bottom:1.2rem;">Accessible sans aucune connaissance technique. Une attestation de participation vous est remise en fin de journée.</p>
+        <a class="btn btn--navy" href="atelier-exploration-ia.html">Programme complet et inscription <span class="arw" aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ============================ PANNEAU : FORMATION CERTIFIANTE IA GÉNÉRATIVE ============================ -->
+<div class="fpanel" id="panel-certifiante">
+<section class="on-cream ftop" aria-label="Formation certifiante IA générative">
+  <div class="wrap">
+    <p class="kicker" style="color:var(--navy);">Certifiée CREA · 2 à 3 jours · Delémont</p>
+    <h2 class="ftitle">Formation certifiante IA générative</h2>
+    <p class="fsub">Pour les professionnel·le·s qui veulent créer des visuels et des processus de travail avec l'IA <em>générative</em>.</p>
+  </div>
+</section>
 <!-- ============================ GENÈSE ============================
      Pourquoi cette formation existe dans le Jura. Placé avant le programme :
      un visiteur qui comprend d'où vient la formation lit le détail autrement.
@@ -756,6 +860,8 @@ h2 em{font-weight:500;}
   </div>
 </section>
 
+</div><!-- /panel-certifiante -->
+
 <!-- ============================ BRIDGE ============================ -->
 <section class="pad on-cream-2">
   <div class="wrap">
@@ -837,8 +943,6 @@ h2 em{font-weight:500;}
     meal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v7a3 3 0 0 0 6 0V3M7 10v11"/><path d="M18 3c-1.7 1.4-2.5 3.4-2.5 6 0 1.7.8 2.8 2.5 3v9"/></svg>'
   };
   var FORMATIONS=[
-    /* Lien vers une page dédiée : href → l'onglet ouvre cette page. */
-    {id:'atelier-exploration-ia',tab:'Atelier Exploration IA',badge:'Nouveau',href:'atelier-exploration-ia.html'},
     {
       id:'ia-generative',tab:'IA générative',badge:'Inscriptions fermées',status:'active',
       title:'Optimiser son quotidien avec l\'intelligence artificielle générative',
@@ -883,6 +987,7 @@ h2 em{font-weight:500;}
   var currentId=(FORMATIONS.filter(function(f){return f.status==='active'&&!f.href;})[0]||FORMATIONS[0]).id;
 
   function renderTabs(){
+    if(!tabsEl)return;   /* onglets remplacés par les cartes du thème */
     tabsEl.innerHTML='';
     FORMATIONS.forEach(function(f){
       if(f.href){
@@ -1130,6 +1235,36 @@ h2 em{font-weight:500;}
   }
 
   renderTabs();renderDetail();
+
+  /* ------------------------------------------------------------------
+     CARTES DE CHOIX → panneaux dépliables (#atelier, #certifiante)
+     ------------------------------------------------------------------ */
+  var cards=$$('.fcard');
+  function ouvrir(nom,defiler){
+    cards.forEach(function(c){
+      var on=c.getAttribute('data-panel')===nom;
+      c.setAttribute('aria-expanded',String(on));
+      var p=document.getElementById('panel-'+c.getAttribute('data-panel'));
+      if(p)p.classList.toggle('is-open',on);
+    });
+    var p=nom&&document.getElementById('panel-'+nom);
+    if(p){
+      $$('[data-a]',p).forEach(function(el){el.classList.add('vis');});
+      initHeights();
+      if(defiler)p.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'});
+    }
+  }
+  cards.forEach(function(c){
+    c.addEventListener('click',function(){
+      var nom=c.getAttribute('data-panel');
+      var deja=c.getAttribute('aria-expanded')==='true';
+      ouvrir(deja?'':nom,!deja);
+      try{history.replaceState(null,'',deja?location.pathname:'#'+nom);}catch(e){}
+    });
+  });
+  var h=(location.hash||'').replace('#','');
+  if(h==='atelier'||h==='certifiante')ouvrir(h,true);
+  else if(['inscription','detail','genese','formateur'].indexOf(h)!==-1){ouvrir('certifiante',false);var el=document.getElementById(h);if(el)el.scrollIntoView();}
 
   /* Animations scroll globales */
   var els=$$('[data-a]');
