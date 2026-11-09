@@ -442,7 +442,7 @@ h2 em{font-weight:500;}
     <p class="lead" data-a data-d="2">Des formations concrètes, pensées pour les PME et les indépendants de Suisse romande. On repart avec des <em>réflexes</em>, pas seulement des notes.</p>
     <!-- Pré-rendu statique : le JS remplace ce contenu, mais il doit exister
          dans le HTML pour être indexé et lisible sans JavaScript. -->
-    <div class="ftabs" id="ftabs" role="tablist" aria-label="Choisir une formation" data-a data-d="3"><button class="ftab" role="tab" aria-selected="true">IA générative <span class="badge">À l'affiche</span></button></div>
+    <div class="ftabs" id="ftabs" role="tablist" aria-label="Choisir une formation" data-a data-d="3"><a class="ftab" href="journee-ia.html">Journée IA en petit groupe <span class="badge">Nouveau</span></a><button class="ftab" role="tab" aria-selected="true">IA générative <span class="badge">À l'affiche</span></button></div>
   </div>
 </section>
 
@@ -837,6 +837,8 @@ h2 em{font-weight:500;}
     meal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v7a3 3 0 0 0 6 0V3M7 10v11"/><path d="M18 3c-1.7 1.4-2.5 3.4-2.5 6 0 1.7.8 2.8 2.5 3v9"/></svg>'
   };
   var FORMATIONS=[
+    /* Lien vers une page dédiée : href → l'onglet ouvre cette page. */
+    {id:'journee-ia',tab:'Journée IA en petit groupe',badge:'Nouveau',href:'journee-ia.html'},
     {
       id:'ia-generative',tab:'IA générative',badge:'Inscriptions fermées',status:'active',
       title:'Optimiser son quotidien avec l\'intelligence artificielle générative',
@@ -878,11 +880,16 @@ h2 em{font-weight:500;}
   ];
 
   var tabsEl=$('#ftabs');
-  var currentId=(FORMATIONS.filter(function(f){return f.status==='active';})[0]||FORMATIONS[0]).id;
+  var currentId=(FORMATIONS.filter(function(f){return f.status==='active'&&!f.href;})[0]||FORMATIONS[0]).id;
 
   function renderTabs(){
     tabsEl.innerHTML='';
     FORMATIONS.forEach(function(f){
+      if(f.href){
+        var a=document.createElement('a');a.className='ftab';a.href=f.href;
+        a.innerHTML=f.tab+(f.badge?' <span class="badge">'+f.badge+'</span>':'');
+        tabsEl.appendChild(a);return;
+      }
       var b=document.createElement('button');
       b.className='ftab'+(f.status==='soon'?' is-soon':'');
       b.setAttribute('role','tab');b.setAttribute('aria-selected',String(f.id===currentId));
