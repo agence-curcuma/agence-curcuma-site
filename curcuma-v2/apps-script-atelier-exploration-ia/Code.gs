@@ -61,7 +61,8 @@ var CONFIG = {
   },
   MENTION_TVA : 'Agence Curcuma n\'est pas assujettie à la TVA.',
   PREFIXE_FACTURE : 'JIA',
-  DOSSIER_FACTURES : 'Atelier Exploration IA — factures',   // dossier Google Drive (créé au besoin)
+  DOSSIER_PARENT   : 'Curcuma Formations',                  // dossier Drive qui accueille les factures (créé au besoin)
+  DOSSIER_FACTURES : 'Atelier Exploration IA — factures',   // sous-dossier des factures (créé au besoin)
 
   /* --- E-mails ------------------------------------------------------- */
   ADMIN_EMAIL    : 'eve@agence-curcuma.ch',
@@ -1411,11 +1412,20 @@ function prochainNumeroFacture_() {
 }
 
 function dossierFactures_() {
-  var props = PropertiesService.getScriptProperties(), id = props.getProperty('dossier_factures');
-  if (id) { try { return DriveApp.getFolderById(id); } catch (e) {} }
-  var it = DriveApp.getFoldersByName(CONFIG.DOSSIER_FACTURES);
-  var dossier = it.hasNext() ? it.next() : DriveApp.createFolder(CONFIG.DOSSIER_FACTURES);
-  props.setProperty('dossier_factures', dossier.getId());
+  var props = PropertiesService.getScriptProperties();
+  var itP = DriveApp.getFoldersByName(CONFIG.DOSSIER_PARENT);
+  var parent = itP.hasNext() ? itP.next() : DriveApp.createFolder(CONFIG.DOSSIER_PARENT);
+  var dossier = null, id = props.getProperty('dossier_factures');
+  if (id) { try { dossier = DriveApp.getFolderById(id); } catch (e) { dossier = null; } }
+  if (!dossier) {
+    var it = parent.getFoldersByName(CONFIG.DOSSIER_FACTURES);
+    dossier = it.hasNext() ? it.next() : parent.createFolder(CONFIG.DOSSIER_FACTURES);
+    props.setProperty('dossier_factures', dossier.getId());
+  }
+  /* Range le dossier dans « Curcuma Formations » s'il est ailleurs. */
+  var dansParent = false, ps = dossier.getParents();
+  while (ps.hasNext()) if (ps.next().getId() === parent.getId()) dansParent = true;
+  if (!dansParent) dossier.moveTo(parent);
   return dossier;
 }
 
