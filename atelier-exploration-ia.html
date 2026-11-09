@@ -57,8 +57,11 @@ section{position:relative;}
 h2{font-weight:800;line-height:1.02;letter-spacing:-.02em;font-size:clamp(2rem,4.6vw,3.4rem);}
 h2 em{font-weight:500;}
 .lead{font-size:clamp(1.12rem,1.8vw,1.45rem);line-height:1.5;max-width:52ch;}
-.kicker{display:inline-flex;align-items:center;gap:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.22em;font-size:.76rem;}
-.kicker::before{content:"";width:26px;height:2px;background:currentColor;}
+.kicker{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--serif);font-style:italic;font-weight:500;
+  font-size:clamp(1.02rem,1.35vw,1.18rem);letter-spacing:0;text-transform:none;line-height:1.3;}
+/* Étoile signature Curcuma (à la place du trait) : couleur = couleur du texte */
+.kicker::before{content:"";flex:none;width:.8em;height:.8em;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z'/%3E%3C/svg%3E") center/contain no-repeat;}
 .hl{background:linear-gradient(var(--yellow),var(--yellow)) left 88%/100% .3em no-repeat;padding:0 .04em;}
 .on-navy .hl{background:none;text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:.14em;text-underline-offset:.1em;}
 .on-cream{background:var(--cream);} .on-cream-2{background:var(--cream-2);}
@@ -416,7 +419,7 @@ h2 em{font-weight:500;}
 
 <header class="hdr" id="hdr">
   <div class="wrap hdr-in">
-    <a class="brand" href="index.html" aria-label="Agence Curcuma"><img src="curcuma-v2/images/logo-curcuma-navy.png" alt="Agence Curcuma — agence marketing" id="brand-logo" width="500" height="150" fetchpriority="high" /></a>
+    <a class="brand" href="index.html" aria-label="Agence Curcuma"><img src="curcuma-v2/images/logo-curcuma-navy.png" alt="Agence Curcuma / agence marketing" id="brand-logo" width="500" height="150" fetchpriority="high" /></a>
     <button class="burger" id="burger" aria-expanded="false" aria-controls="nav" aria-label="Menu"><span></span><span></span><span></span></button>
     <nav class="nav" id="nav">
       <a href="index.html#methode">La méthode</a>
@@ -433,7 +436,7 @@ h2 em{font-weight:500;}
   <span class="blob" style="width:300px;height:300px;top:-70px;right:-70px;opacity:.85;" aria-hidden="true"></span>
   <span class="blob" style="width:150px;height:150px;bottom:-30px;left:38%;opacity:.45;" aria-hidden="true"></span>
   <div class="wrap">
-    <p class="kicker" style="color:var(--navy);" data-a><a href="formations.html" style="color:inherit;">Curcuma Formations</a> · Atelier Exploration IA</p>
+    <p class="kicker" style="color:var(--navy);" data-a><a href="formations.html" style="color:inherit;">Curcuma Formations</a> / Atelier Exploration IA</p>
     <h1 class="display" data-a data-d="1">Explorer l'IA, puis la mettre en place pour <span class="hl">vous</span>.</h1>
     <p class="lead" data-a data-d="2">Une journée en petit groupe, une fois par mois en présentiel. Le matin, des démonstrations de cas d'usage pour la productivité, la bureautique et la communication. L'après-midi, la pratique : on met en place, en direct, un usage concret pour <em>votre</em> quotidien.</p>
     <p data-a data-d="3" style="margin-top:2rem;"><a class="btn btn--navy" href="#dates">Choisir ma date <span class="arw" aria-hidden="true">→</span></a></p>
@@ -446,16 +449,16 @@ h2 em{font-weight:500;}
   <div class="wrap" style="position:relative;z-index:2;">
     <div class="fhead">
       <div data-a>
-        <p class="kicker" style="color:var(--navy);">Une fois par mois en présentiel · 4 personnes</p>
+        <p class="kicker" style="color:var(--navy);">Une fois par mois en présentiel / 4 personnes</p>
         <h2>Un atelier d'exploration, un usage mis en place en direct</h2>
       </div>
       <div class="fmeta" data-a data-d="1">
-        <span class="chip"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>1 journée · 8h30–17h00</span></span>
+        <span class="chip"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>1 journée / 8h30–17h00</span></span>
         <span class="chip"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg><span>4 personnes au maximum</span></span>
         <span class="chip"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 12 22l-9-9V3h10l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg><span>CHF 600.–</span></span>
         <span class="chip"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v7a3 3 0 0 0 6 0V3M7 10v11"/><path d="M18 3c-1.7 1.4-2.5 3.4-2.5 6 0 1.7.8 2.8 2.5 3v9"/></svg><span>Repas de midi et boissons inclus</span></span>
         <span class="chip"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Aucune connaissance technique</span></span>
-        <span class="chip"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Au Bévan 11b · Courtételle</span></span>
+        <span class="chip"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Au Bévan 11b / Courtételle</span></span>
       </div>
     </div>
 
@@ -469,27 +472,27 @@ h2 em{font-weight:500;}
 
     <div class="days" id="days" role="list" aria-label="Programme de la journée">
       <div class="day is-open" role="listitem">
-        <h3 style="margin:0;"><button class="day__t" aria-expanded="true" aria-controls="jia-0"><span class="day__n">Matin · démos</span><span class="day__ti">Explorer ce que l'IA peut faire</span><span class="day__ic" aria-hidden="true"></span></button></h3>
+        <h3 style="margin:0;"><button class="day__t" aria-expanded="true" aria-controls="jia-0"><span class="day__n">Matin / démos</span><span class="day__ti">Explorer ce que l'IA peut faire</span><span class="day__ic" aria-hidden="true"></span></button></h3>
         <div class="day__p" id="jia-0" role="region"><div class="day__pin">
           <p class="dl">Des démonstrations en direct, sur des cas concrets.</p>
           <div class="mods">
-            <div class="mod"><p><strong>Ce que l'IA sait faire, et ce qu'elle ne sait pas — </strong>pour savoir quand lui faire confiance et quand vérifier.</p></div>
-            <div class="mod"><p><strong>Bien formuler sa demande — </strong>la méthode pour obtenir une réponse utile du premier coup, ou presque.</p></div>
-            <div class="mod"><p><strong>Écrire et communiquer — </strong>rédiger, reformuler, résumer : e-mails, courriers, documents.</p></div>
-            <div class="mod"><p><strong>Mettre en page — </strong>des documents et des visuels simples et professionnels, sans logiciel de graphisme.</p></div>
-            <div class="mod"><p><strong>S'organiser — </strong>planifier sa semaine, suivre ses démarches, préparer un rendez-vous important.</p></div>
-            <div class="mod"><p><strong>Sécurité — </strong>ce qu'on peut confier à l'IA, ce qu'on garde pour soi, et comment vérifier ses réponses.</p></div>
+            <div class="mod"><p><strong>Ce que l'IA sait faire, et ce qu'elle ne sait pas :</strong> pour savoir quand lui faire confiance et quand vérifier.</p></div>
+            <div class="mod"><p><strong>Bien formuler sa demande :</strong> la méthode pour obtenir une réponse utile du premier coup, ou presque.</p></div>
+            <div class="mod"><p><strong>Écrire et communiquer :</strong> rédiger, reformuler, résumer : e-mails, courriers, documents.</p></div>
+            <div class="mod"><p><strong>Mettre en page :</strong> des documents et des visuels simples et professionnels, sans logiciel de graphisme.</p></div>
+            <div class="mod"><p><strong>S'organiser :</strong> planifier sa semaine, suivre ses démarches, préparer un rendez-vous important.</p></div>
+            <div class="mod"><p><strong>Sécurité :</strong> ce qu'on peut confier à l'IA, ce qu'on garde pour soi, et comment vérifier ses réponses.</p></div>
           </div>
         </div></div>
       </div>
       <div class="day" role="listitem">
-        <h3 style="margin:0;"><button class="day__t" aria-expanded="false" aria-controls="jia-1"><span class="day__n">Après-midi · pratique</span><span class="day__ti">L'IA à votre service, adaptée à vos besoins</span><span class="day__ic" aria-hidden="true"></span></button></h3>
+        <h3 style="margin:0;"><button class="day__t" aria-expanded="false" aria-controls="jia-1"><span class="day__n">Après-midi / pratique</span><span class="day__ti">L'IA à votre service, adaptée à vos besoins</span><span class="day__ic" aria-hidden="true"></span></button></h3>
         <div class="day__p" id="jia-1" role="region"><div class="day__pin">
           <p class="dl">À vous de jouer : chacun·e choisit une tâche de son quotidien, et on la met en place ensemble.</p>
           <div class="mods">
-            <div class="mod"><p><strong>Choisir sa tâche — </strong>ce qui vous prend du temps ou de l'énergie chaque semaine, par exemple : organisation personnelle, mise en page et production de documents, aide à la réflexion…</p></div>
-            <div class="mod"><p><strong>Mettre en place, en direct — </strong>on construit votre usage pas à pas, avec moi à vos côtés, on l'essaie sur vos vrais documents, on l'ajuste.</p></div>
-            <div class="mod"><p><strong>Repartir équipé·e — </strong>votre usage prêt à servir dès le lendemain, et une attestation de participation pour votre dossier.</p></div>
+            <div class="mod"><p><strong>Choisir sa tâche :</strong> ce qui vous prend du temps ou de l'énergie chaque semaine, par exemple : organisation personnelle, mise en page et production de documents, aide à la réflexion…</p></div>
+            <div class="mod"><p><strong>Mettre en place, en direct :</strong> on construit votre usage pas à pas, avec moi à vos côtés, on l'essaie sur vos vrais documents, on l'ajuste.</p></div>
+            <div class="mod"><p><strong>Repartir équipé·e :</strong> votre usage prêt à servir dès le lendemain, et une attestation de participation pour votre dossier.</p></div>
           </div>
         </div></div>
       </div>
@@ -707,8 +710,8 @@ h2 em{font-weight:500;}
     <img src="curcuma-v2/images/logo-curcuma-yellow.png" alt="Agence Curcuma" width="500" height="150" loading="lazy" decoding="async" />
     <p style="max-width:34ch;color:var(--cream-on-navy);margin-bottom:2rem;">Formations concrètes pour PME et indépendants de Suisse romande.</p>
     <div class="ftr-bot">
-      <span>© <span id="yr"></span> Agence Curcuma — écouter, connecter, croître.</span>
-      <span>Jura · Suisse romande · <a href="index.html">Accueil</a> · <a href="conditions-generales.html">Conditions générales</a> · <a href="mentions-legales.html">Mentions légales</a></span>
+      <span>© <span id="yr"></span> Agence Curcuma / écouter, connecter, croître.</span>
+      <span>Jura / Suisse romande / <a href="index.html">Accueil</a> / <a href="conditions-generales.html">Conditions générales</a> / <a href="mentions-legales.html">Mentions légales</a></span>
     </div>
   </div>
 </footer> <button class="totop" id="totop" type="button" aria-label="Remonter en haut de la page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
@@ -789,7 +792,7 @@ h2 em{font-weight:500;}
       c.classList.remove('is-few','is-wait','is-closed');
       if(!e){s.textContent='';return;}
       if(!e.ouverte){c.classList.add('is-closed');inp.disabled=true;inp.checked=false;s.textContent=e.annulee?'Date annulée':'Inscriptions fermées';return;}
-      if(e.complet){c.classList.add('is-wait');s.textContent='Complet · liste d\'attente';return;}
+      if(e.complet){c.classList.add('is-wait');s.textContent='Complet / liste d\'attente';return;}
       if(e.liste_attente){c.classList.add('is-wait');s.textContent='Liste d\'attente ouverte';return;}
       var n=e.places_restantes;
       if(n<=2)c.classList.add('is-few');
