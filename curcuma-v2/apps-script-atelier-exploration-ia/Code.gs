@@ -610,7 +610,8 @@ function emailRappel_(l) {
     'À prévoir : votre ordinateur portable et son chargeur, et votre abonnement Claude Pro actif (environ 20 CHF par mois). ' +
     'Le repas de midi, les boissons et les cafés sont offerts.\n\n' +
     'Pour gagner du temps l\'après-midi, pensez déjà à une tâche de votre quotidien que vous aimeriez confier à l\'IA.\n\n' +
-    'Un empêchement ? Répondez simplement à cet e-mail.\n\n' +
+    'Un empêchement ? Le délai d\'annulation est passé, mais vous pouvez vous faire remplacer par une autre personne, sans frais, jusqu\'à la veille. ' +
+    'Répondez simplement à cet e-mail avec son nom et son adresse e-mail.\n\n' +
     'À bientôt,\nEve Schaller\nAgence Curcuma';
   envoyer_(l.email, 'Plus qu\'une semaine — ' + CONFIG.TITRE + ' du ' + s.label, corps, [icsBlob_(s)]);
 }
