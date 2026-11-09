@@ -41,7 +41,7 @@ var CONFIG = {
   CLOTURE_VEILLE_HEURE : '12:00',
   FUSEAU : 'Europe/Zurich',
 
-  TITRE       : 'Journée IA en petit groupe',
+  TITRE       : 'Journée exploration IA',
   LIEU_LIGNE1 : 'Au Bévan 11b',
   LIEU_LIGNE2 : '2852 Courtételle',
   URL_PAGE    : 'https://www.agence-curcuma.ch/journee-ia.html',
@@ -83,12 +83,14 @@ var STATUTS_CONFIRMES  = [ST.PAYEE, ST.PEC];
 var COL = {
   DATE: 1, SESSION: 2, DATE_COURS: 3, PRENOM: 4, NOM: 5, EMAIL: 6,
   RUE: 7, NPA: 8, LOCALITE: 9, ATTENTES: 10, NEWSLETTER: 11, CONSENTEMENT: 12,
-  STATUT: 13, RESERVEE_JUSQU: 14, PAIEMENT_RECU: 15, DATE_PAIEMENT: 16,
-  FACTURE: 17, CONFIRM_ENVOYEE: 18, ENTREE_ATTENTE: 19, NOTES: 20, HISTORIQUE: 21
+  CHOMAGE: 13, CAISSE: 14, VALIDATION_ORP: 15,
+  STATUT: 16, RESERVEE_JUSQU: 17, PAIEMENT_RECU: 18, DATE_PAIEMENT: 19,
+  FACTURE: 20, CONFIRM_ENVOYEE: 21, ENTREE_ATTENTE: 22, NOTES: 23, HISTORIQUE: 24
 };
 var HEADERS = [
   "Date d'inscription", 'Session', 'Date du cours', 'Prénom', 'Nom', 'E-mail',
   'Rue et n°', 'NPA', 'Localité', 'Ce que la personne aimerait faire', 'Newsletter', 'Conditions acceptées',
+  'Via le chômage', 'Caisse de chômage', 'ORP : formation déjà validée ?',
   'Statut', "Réservée jusqu'au", 'Paiement reçu', 'Date de paiement', 'N° de facture',
   'Confirmation envoyée', "Entrée en liste d'attente", 'Notes', 'Historique'
 ];
@@ -139,8 +141,12 @@ function doPost(e) {
       localite  : nettoyer_(data.localite, 35),
       attentes  : nettoyer_(data.attentes, 2000),
       newsletter: estCoche_(data.newsletter) ? 'oui' : 'non',
-      consentement: estCoche_(data.consentement) ? 'oui' : 'non'
+      consentement: estCoche_(data.consentement) ? 'oui' : 'non',
+      chomage   : estCoche_(data.chomage) ? 'oui' : 'non',
+      caisse    : nettoyer_(data.caisse, 80),
+      validation: nettoyer_(data.validation_orp, 20)
     };
+    if (p.chomage !== 'oui') { p.caisse = ''; p.validation = ''; }
     var s = trouverSession_(p.session);
     if (!s) return json_({ status: 'ERREUR', message: 'Merci de choisir une date.' });
     if (new Date() >= clotureSession_(s)) {
@@ -150,6 +156,9 @@ function doPost(e) {
     if (!emailValide_(p.email)) return json_({ status: 'ERREUR', message: 'Adresse e-mail invalide.' });
     if (!p.rue || !p.npa || !p.localite) {
       return json_({ status: 'ERREUR', message: 'Merci d\'indiquer votre adresse : elle figure sur la facture.' });
+    }
+    if (p.chomage === 'oui' && !p.caisse) {
+      return json_({ status: 'ERREUR', message: 'Merci d\'indiquer votre caisse de chômage.' });
     }
     if (p.consentement !== 'oui') return json_({ status: 'ERREUR', message: 'L\'acceptation des conditions est nécessaire.' });
 
@@ -183,7 +192,7 @@ function doPost(e) {
     expires.forEach(function (x) { emailExpiration_(x); });
 
     if (res.statut === ST.RESERVEE) {
-      notifierAdmin_('Nouvelle inscription — ' + s.label,
+      notifierAdmin_('Nouvelle inscription' + (p.chomage === 'oui' ? ' (chômage)' : '') + ' — ' + s.label,
         resumeAdmin_(p, s, ST.RESERVEE, res.actives + 1, res.ligne));
       majAgenda_(s.id);
       return json_({ status: 'INSCRIT', places_restantes: Math.max(0, CONFIG.PLACES_MAX - res.actives - 1) });
@@ -238,7 +247,7 @@ function attribuerPlace_(sh, r, promotion) {
 function expirerEchues_(sh, lignes, sessionId, max) {
   var maintenant = new Date();
   var echues = lignes.filter(function (l) {
-    return l.session === sessionId && l.statut === ST.RESERVEE && !l.paiementRecu &&
+    return l.session === sessionId && l.statut === ST.RESERVEE && !l.paiementRecu && !l.chomage &&
       l.reserveeJusqu instanceof Date && l.reserveeJusqu < maintenant;
   }).sort(function (a, b) { return a.reserveeJusqu - b.reserveeJusqu; }).slice(0, max);
 
@@ -368,7 +377,7 @@ function verifierEcheances() {
       } else {
         lignes.forEach(function (l) {
           var cle = 'retard_' + s.id + '_' + l.email;
-          if (l.session === s.id && l.statut === ST.RESERVEE && l.reserveeJusqu instanceof Date &&
+          if (l.session === s.id && l.statut === ST.RESERVEE && !l.chomage && l.reserveeJusqu instanceof Date &&
               l.reserveeJusqu < maintenant && !props.getProperty(cle)) {
             props.setProperty(cle, '1');
             notifierAdmin_('Paiement en retard — ' + s.label,
@@ -469,10 +478,13 @@ function emailFacture_(l, s, echeance, pdf, promotion) {
       ? 'Bonne nouvelle : une place s\'est libérée pour la ' + CONFIG.TITRE + ' du ' + s.label + '. Elle est à vous.\n\n'
       : 'Merci pour votre inscription à la ' + CONFIG.TITRE + ' du ' + s.label + '.\n\n') +
     infosPratiques_(s) + '\n\n' +
-    'Votre place est réservée jusqu\'au ' + dateLongue_(echeance) + '. Elle est confirmée dès réception de votre paiement de ' +
-    montantTexte_() + '.\n\n' +
-    'Vous trouverez la facture en pièce jointe. Le bulletin QR en bas de page se scanne directement avec l\'application de votre banque.\n\n' +
-    'Sans paiement à cette date, la place est proposée à la personne suivante et votre inscription passe en liste d\'attente.\n\n' +
+    (l.chomage
+      ? 'Vous trouverez la facture en pièce jointe : merci de la transmettre à votre caisse de chômage (' + l.caisse + '). ' +
+        'Votre place vous est gardée et je la confirme dès que je reçois le courrier de l\'ORP.\n\n'
+      : 'Votre place est réservée jusqu\'au ' + dateLongue_(echeance) + '. Elle est confirmée dès réception de votre paiement de ' +
+        montantTexte_() + '.\n\n' +
+        'Vous trouverez la facture en pièce jointe. Le bulletin QR en bas de page se scanne directement avec l\'application de votre banque.\n\n' +
+        'Sans paiement à cette date, la place est proposée à la personne suivante et votre inscription passe en liste d\'attente.\n\n') +
     'À prévoir pour la journée : un abonnement Claude Pro (environ 20 CHF par mois). Le repas de midi, les boissons et les cafés sont offerts.\n\n' +
     'Une question ? Répondez simplement à cet e-mail.\n\n' +
     'À bientôt,\nEve Schaller\nAgence Curcuma';
@@ -536,7 +548,10 @@ function resumeAdmin_(p, s, statut, actives, ligne) {
   return [
     'Date : ' + s.label, 'Statut : ' + statut, 'Ligne : ' + ligne, '',
     p.prenom + ' ' + p.nom + ' <' + p.email + '>',
-    p.rue + ', ' + p.npa + ' ' + p.localite, '',
+    p.rue + ', ' + p.npa + ' ' + p.localite,
+    p.chomage === 'oui' ? 'VIA LE CHÔMAGE — caisse : ' + p.caisse + ' — ORP a déjà validé : ' + (p.validation || '?') +
+      '\n→ place gardée sans délai ; mets PRISE_EN_CHARGE à réception du courrier de l\'ORP.' : 'Paiement personnel (72 h)',
+    '',
     'Ce que la personne aimerait faire :', (p.attentes || '—'), '',
     'Places occupées : ' + actives + ' / ' + CONFIG.PLACES_MAX
   ].join('\n');
@@ -570,7 +585,7 @@ function majAgenda_(sessionId) {
     ev.setTitle(CONFIG.TITRE + ' — ' + conf.length + '/' + CONFIG.PLACES_MAX + ' confirmées' + (res.length ? ' (+' + res.length + ' en attente de paiement)' : ''));
     ev.setDescription(
       'Confirmées :\n' + (conf.map(function (l) { return '· ' + l.prenom + ' ' + l.nom + (l.statut === ST.PEC ? ' (prise en charge)' : ''); }).join('\n') || '—') +
-      '\n\nRéservées, paiement attendu :\n' + (res.map(function (l) { return '· ' + l.prenom + ' ' + l.nom + ' (jusqu\'au ' + horodate_(l.reserveeJusqu) + ')'; }).join('\n') || '—') +
+      '\n\nRéservées, paiement attendu :\n' + (res.map(function (l) { return '· ' + l.prenom + ' ' + l.nom + (l.chomage ? ' (chômage, en attente de l\'ORP)' : ' (jusqu\'au ' + horodate_(l.reserveeJusqu) + ')'); }).join('\n') || '—') +
       '\n\nListe d\'attente :\n' + (att.map(function (l) { return '· ' + l.prenom + ' ' + l.nom; }).join('\n') || '—') +
       '\n\nMis à jour automatiquement depuis la feuille d\'inscriptions.');
   } catch (err) {
@@ -604,7 +619,8 @@ function icsBlob_(s) {
 function factureBlob_(l, s, numero, dateFacture, echeance) {
   var octets = facturePdf_({
     numero: numero, date: dateFacture, echeance: echeance, session: s,
-    client: { prenom: l.prenom, nom: l.nom, rue: l.rue, npa: l.npa, localite: l.localite }
+    client: { prenom: l.prenom, nom: l.nom, rue: l.rue, npa: l.npa, localite: l.localite },
+    chomage: !!l.chomage, caisse: l.caisse || ''
   });
   var signes = octets.map(function (b) { return b > 127 ? b - 256 : b; });
   return Utilities.newBlob(signes, 'application/pdf', 'Facture ' + numero + ' - ' + l.prenom + ' ' + l.nom + '.pdf');
@@ -629,7 +645,7 @@ function payloadQr_(d) {
 }
 
 function messageQr_(d) {
-  return (CONFIG.TITRE.replace('Journée IA en petit groupe', 'Journée IA') + ' ' + dateCourte_(debutSession_(d.session)) +
+  return ('Journée IA ' + dateCourte_(debutSession_(d.session)) +
     ' - ' + d.client.prenom + ' ' + d.client.nom + ' - Facture ' + d.numero).substring(0, 140);
 }
 
@@ -681,7 +697,7 @@ function facturePdf_(d) {
   var infos = [
     ['N° de facture', d.numero],
     ['Date', dateCourte_(d.date)],
-    ['À payer d\'ici le', dateCourte_(d.echeance) + ' (confirme votre place)']
+    d.chomage ? ['Prise en charge', 'demandée à : ' + d.caisse] : ['À payer d\'ici le', dateCourte_(d.echeance) + ' (confirme votre place)']
   ];
   infos.forEach(function (row, i) {
     pdf.text(row[0], 20 * mm, (212 - i * 5.5) * mm, 'F1', 9.5, GRIS);
@@ -696,7 +712,7 @@ function facturePdf_(d) {
   pdf.line(20 * mm, y - 2.5 * mm, droite, y - 2.5 * mm, 0.6, NAVY);
 
   y -= 9 * mm;
-  pdf.text(CONFIG.TITRE + ' (4 personnes au maximum)', 20 * mm, y, 'F2', 10.5, NOIR);
+  pdf.text(CONFIG.TITRE + ' en petit groupe (4 personnes au maximum)', 20 * mm, y, 'F2', 10.5, NOIR);
   pdf.textRight(montantAffiche_(), droite, y, 'F2', 10.5, NOIR);
   [
     s.label.charAt(0).toUpperCase() + s.label.slice(1) + ', ' + horaire_(),
@@ -714,7 +730,8 @@ function facturePdf_(d) {
   y -= 14 * mm;
   [
     CONFIG.MENTION_TVA,
-    'Votre place est réservée jusqu\'au ' + dateCourte_(d.echeance) + ' et confirmée à réception du paiement.',
+    d.chomage ? 'Facture à transmettre à votre caisse de chômage. Votre place est confirmée dès réception du courrier de l\'ORP.'
+      : 'Votre place est réservée jusqu\'au ' + dateCourte_(d.echeance) + ' et confirmée à réception du paiement.',
     'Merci d\'utiliser le bulletin QR ci-dessous : il reprend automatiquement la communication du versement.'
   ].forEach(function (t, i) { pdf.text(t, 20 * mm, y - i * 4.6 * mm, 'F1', 9, GRIS); });
 
@@ -905,7 +922,9 @@ function objet_(v, r) {
     statut: String(g(COL.STATUT) || '').trim().toUpperCase(),
     reserveeJusqu: g(COL.RESERVEE_JUSQU), paiementRecu: g(COL.PAIEMENT_RECU) === true,
     facture: String(g(COL.FACTURE) || ''), confirmEnvoyee: g(COL.CONFIRM_ENVOYEE) === true,
-    entreeAttente: g(COL.ENTREE_ATTENTE)
+    entreeAttente: g(COL.ENTREE_ATTENTE),
+    chomage: String(g(COL.CHOMAGE) || '').toLowerCase() === 'oui',
+    caisse: String(g(COL.CAISSE) || ''), validation: String(g(COL.VALIDATION_ORP) || '')
   };
 }
 
@@ -917,7 +936,7 @@ function ecrireInscription_(sh, p, s, statut) {
   var maintenant = new Date();
   sh.appendRow([
     maintenant, s.id, s.label, p.prenom, p.nom, p.email, p.rue, "'" + p.npa, p.localite, p.attentes,
-    p.newsletter, p.consentement, statut, '', false, '', '', false,
+    p.newsletter, p.consentement, p.chomage, p.caisse, p.validation, statut, '', false, '', '', false,
     statut === ST.ATTENTE ? maintenant : '', '', horodate_(maintenant) + ' — inscription : ' + statut
   ]);
   var r = sh.getLastRow();
@@ -1048,7 +1067,7 @@ function initialiserFeuille() {
   sh.setRowHeight(1, 44);
   sh.setFrozenRows(1);
   sh.setFrozenColumns(5);
-  var larg = [130, 120, 170, 110, 110, 210, 170, 60, 120, 280, 85, 90, 160, 130, 90, 130, 120, 100, 140, 220, 320];
+  var larg = [130, 120, 170, 110, 110, 210, 170, 60, 120, 280, 85, 90, 90, 180, 130, 160, 130, 90, 130, 120, 100, 140, 220, 320];
   larg.forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
   var n = Math.max(sh.getMaxRows() - 1, 300);
   sh.getRange(2, COL.STATUT, n, 1).setDataValidation(SpreadsheetApp.newDataValidation()
