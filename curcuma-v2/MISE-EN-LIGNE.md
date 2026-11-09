@@ -117,7 +117,7 @@ http://www.agence-curcuma.ch
 
    ```
    Agence Curcuma – Eve Schaller
-   Sur le Bévan 11a
+   Au Bévan 11b
    2852 Courtételle
    +41 79 582 84 37
    ```
