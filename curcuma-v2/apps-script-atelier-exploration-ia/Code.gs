@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  *  AGENCE CURCUMA — Atelier Exploration IA (Google Apps Script)
- *  Backend de la page journee-ia.html
+ *  Backend de la page atelier-exploration-ia.html
  *
  *  - reçoit les inscriptions (une date au choix parmi les sessions),
  *  - 4 places par date ; une place est RÉSERVÉE 72 h, puis CONFIRMÉE
@@ -13,7 +13,7 @@
  *  - événement de la journée tenu à jour dans l'agenda d'Eve,
  *  - e-mail à Eve quand une date est complète (4 confirmées).
  *
- *  Installation : voir JOURNEE-IA-mode-emploi.md (même dossier).
+ *  Installation : voir ATELIER-IA-mode-emploi.md (même dossier).
  * ============================================================================
  */
 
@@ -29,7 +29,7 @@ var CONFIG = {
   ALERTE_MINIMUM_JOURS : 7,   // Eve est prévenue X jours avant si < PLACES_MIN confirmées
 
   /* Dates proposées. Ajouter une ligne suffit pour ouvrir une nouvelle date
-     (et l'ajouter aussi dans journee-ia.html, tableau SESSIONS). */
+     (et l'ajouter aussi dans atelier-exploration-ia.html, tableau SESSIONS). */
   SESSIONS : [
     { id: 'JIA-2026-12-10', date: '2026-12-10', label: 'jeudi 10 décembre 2026' },
     { id: 'JIA-2027-01-14', date: '2027-01-14', label: 'jeudi 14 janvier 2027' },
@@ -44,7 +44,11 @@ var CONFIG = {
   TITRE       : 'Atelier Exploration IA',
   LIEU_LIGNE1 : 'Au Bévan 11b',
   LIEU_LIGNE2 : '2852 Courtételle',
-  URL_PAGE    : 'https://www.agence-curcuma.ch/journee-ia.html',
+  URL_PAGE    : 'https://www.agence-curcuma.ch/atelier-exploration-ia.html',
+  /* Accès, repris dans les e-mails */
+  ACCES       : 'Places de parc visiteurs sur place, parc à vélos, arrêt de bus à proximité (Courtételle, Courtemelon).',
+  MAPS        : 'https://www.google.com/maps/search/?api=1&query=Au+B%C3%A9van+11b%2C+2852+Court%C3%A9telle',
+  RAPPEL_JOURS: 7,   // e-mail de rappel aux personnes confirmées
 
   /* --- Facturation --------------------------------------------------- */
   PRIX     : 600,
@@ -76,6 +80,7 @@ var ST = {
   PEC      : 'PRISE_EN_CHARGE',  // confirmée sans attendre le paiement (courrier ORP)
   ATTENTE  : 'LISTE_ATTENTE',
   PREINSCR : 'PREINSCRIPTION_ORP', // chômage, ORP pas encore validé : ni place ni facture
+  DESACTIVEE: 'DESACTIVEE',        // réservation non payée cédée à quelqu'un d'autre ; réactivable par lien
   ANNULEE  : 'ANNULEE'
 };
 var STATUTS_ACTIFS     = [ST.RESERVEE, ST.PAYEE, ST.PEC];   // occupent une place
@@ -86,14 +91,14 @@ var COL = {
   RUE: 7, NPA: 8, LOCALITE: 9, ATTENTES: 10, NEWSLETTER: 11, CONSENTEMENT: 12,
   CHOMAGE: 13, CAISSE: 14, VALIDATION_ORP: 15,
   STATUT: 16, RESERVEE_JUSQU: 17, PAIEMENT_RECU: 18, DATE_PAIEMENT: 19,
-  FACTURE: 20, CONFIRM_ENVOYEE: 21, ENTREE_ATTENTE: 22, NOTES: 23, HISTORIQUE: 24
+  FACTURE: 20, CONFIRM_ENVOYEE: 21, ENTREE_ATTENTE: 22, NOTES: 23, HISTORIQUE: 24, CODE: 25
 };
 var HEADERS = [
   "Date d'inscription", 'Session', 'Date du cours', 'Prénom', 'Nom', 'E-mail',
   'Rue et n°', 'NPA', 'Localité', 'Ce que la personne aimerait faire', 'Newsletter', 'Conditions acceptées',
   'Via le chômage', 'Caisse de chômage', 'ORP : formation déjà validée ?',
   'Statut', "Réservée jusqu'au", 'Paiement reçu', 'Date de paiement', 'N° de facture',
-  'Confirmation envoyée', "Entrée en liste d'attente", 'Notes', 'Historique'
+  'Confirmation envoyée', "Entrée en liste d'attente", 'Notes', 'Historique', 'Code de réactivation'
 ];
 var LAST_COL = HEADERS.length;
 
@@ -103,7 +108,8 @@ var LAST_COL = HEADERS.length;
    ========================================================================== */
 
 /** État des places pour le calendrier de la page. */
-function doGet() {
+function doGet(e) {
+  if (e && e.parameter && e.parameter.action === 'reactiver') return reactiver_(e.parameter.code);
   try {
     var sh = getSheet_();
     var lignes = lireTout_(sh);
@@ -174,7 +180,7 @@ function doPost(e) {
     try {
       var sh = getSheet_();
       var lignes = lireTout_(sh);
-      if (lignes.some(function (l) { return l.session === s.id && l.email === p.email && l.statut !== ST.ANNULEE; })) {
+      if (lignes.some(function (l) { return l.session === s.id && l.email === p.email && l.statut !== ST.ANNULEE && l.statut !== ST.DESACTIVEE; })) {
         return json_({ status: 'DOUBLON' });
       }
       /* ORP pas encore d'accord : pré-inscription, sans place ni facture. */
@@ -227,6 +233,75 @@ function doPost(e) {
 }
 
 
+/**
+ * Lien de réactivation (e-mail « inscription annulée ») : place libre →
+ * nouvelle réservation 72 h avec facture ; sinon → liste d'attente.
+ */
+function reactiver_(code) {
+  var msg, titre = 'Réactivation';
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(20000)) return pageReponse_('Un instant…', 'Le service est occupé. Merci de réessayer dans une minute.');
+  var notif = null, l = null, s = null;
+  try {
+    var sh = getSheet_();
+    code = String(code || '').replace(/[^a-f0-9]/gi, '');
+    l = code ? lireTout_(sh).filter(function (x) { return x.code === code; })[0] : null;
+    s = l ? trouverSession_(l.session) : null;
+    if (!l || !s) {
+      msg = ['Lien inconnu', 'Ce lien n\'est pas valable. Écrivez-moi à ' + CONFIG.ADMIN_EMAIL + ', je regarde avec vous.'];
+    } else if (l.statut !== ST.DESACTIVEE) {
+      msg = ['C\'est déjà fait', 'Votre inscription au ' + s.label + ' est déjà active (' + libelleStatut_(l.statut) + '). Rien d\'autre à faire.'];
+    } else if (new Date() >= clotureSession_(s)) {
+      msg = ['Inscriptions fermées', 'Les inscriptions pour le ' + s.label + ' sont fermées. Les prochaines dates sont sur ' + CONFIG.URL_PAGE];
+    } else {
+      var libres = CONFIG.PLACES_MAX - compter_(lireTout_(sh), s.id, STATUTS_ACTIFS);
+      tracer_(sh, l.ligne, 'inscription réactivée par la personne (lien)');
+      if (libres > 0) {
+        attribuerPlace_(sh, l.ligne, false);
+        msg = ['Inscription réactivée', 'Votre place au ' + s.label + ' est à nouveau réservée pour ' + CONFIG.RESERVATION_HEURES +
+          ' heures. Vous recevez la facture par e-mail dans quelques minutes.'];
+        notif = 'place réservée à nouveau (facture renvoyée)';
+      } else {
+        sh.getRange(l.ligne, COL.STATUT).setValue(ST.ATTENTE);
+        sh.getRange(l.ligne, COL.ENTREE_ATTENTE).setValue(new Date());
+        msg = ['Vous êtes en liste d\'attente', 'Les ' + CONFIG.PLACES_MAX + ' places du ' + s.label + ' sont prises. Votre inscription est ' +
+          'réactivée en liste d\'attente : dès qu\'une place se libère, elle vous est attribuée avec la facture.'];
+        notif = 'liste d\'attente (date complète)';
+      }
+      SpreadsheetApp.flush();
+    }
+  } finally {
+    lock.releaseLock();
+  }
+  if (notif) {
+    notifierAdmin_('Inscription réactivée — ' + s.label, l.prenom + ' ' + l.nom + ' (' + l.email + ') : ' + notif + '.');
+    majAgenda_(s.id);
+  }
+  return pageReponse_(msg[0], msg[1]);
+}
+
+function libelleStatut_(st) {
+  return ({ RESERVEE_72H: 'place réservée', PAYEE: 'place confirmée', PRISE_EN_CHARGE: 'place confirmée',
+    LISTE_ATTENTE: 'liste d\'attente', PREINSCRIPTION_ORP: 'pré-inscription', ANNULEE: 'annulée' })[st] || st;
+}
+
+/** Petite page de réponse aux couleurs du site. */
+function pageReponse_(titre, texte) {
+  var esc = function (x) { return String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;'); };
+  var html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;800&display=swap" rel="stylesheet"></head>' +
+    '<body style="margin:0;background:#f7f1e3;font-family:Barlow,Arial,sans-serif;color:#14213d">' +
+    '<div style="max-width:560px;margin:12vh auto;padding:32px 24px;background:#14213d;border-radius:28px;color:#f7f1e3">' +
+    '<p style="margin:0 0 12px;color:#f2ff49;font-weight:800;letter-spacing:.18em;text-transform:uppercase;font-size:12px">' + esc(CONFIG.TITRE) + '</p>' +
+    '<h1 style="margin:0 0 14px;color:#fff;font-size:28px;line-height:1.15">' + esc(titre) + '</h1>' +
+    '<p style="margin:0 0 22px;line-height:1.6;color:rgba(247,241,227,.85)">' + esc(texte) + '</p>' +
+    '<a href="' + CONFIG.URL_PAGE + '" style="display:inline-block;background:#f2ff49;color:#14213d;font-weight:800;text-decoration:none;padding:12px 22px;border-radius:999px">Voir l\'atelier</a>' +
+    '</div></body></html>';
+  return HtmlService.createHtmlOutput(html).setTitle(CONFIG.TITRE)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+
 /* ==========================================================================
    3. RÈGLES DE GESTION
    ========================================================================== */
@@ -270,9 +345,10 @@ function expirerEchues_(sh, lignes, sessionId, max) {
   }).sort(function (a, b) { return a.reserveeJusqu - b.reserveeJusqu; }).slice(0, max);
 
   echues.forEach(function (l) {
-    sh.getRange(l.ligne, COL.STATUT).setValue(ST.ATTENTE);
-    sh.getRange(l.ligne, COL.ENTREE_ATTENTE).setValue(maintenant);
-    tracer_(sh, l.ligne, 'réservation échue sans paiement → liste d\'attente');
+    l.code = l.code || Utilities.getUuid().replace(/-/g, '');
+    sh.getRange(l.ligne, COL.STATUT).setValue(ST.DESACTIVEE);
+    sh.getRange(l.ligne, COL.CODE).setValue(l.code);
+    tracer_(sh, l.ligne, 'réservation échue sans paiement, place cédée → inscription désactivée');
   });
   if (echues.length) SpreadsheetApp.flush();
   return echues;
@@ -394,7 +470,7 @@ function verifierComplet_(sh, s) {
 function verifierEcheances() {
   var lock = LockService.getScriptLock();
   if (!lock.tryLock(30000)) return;
-  var aPrevenir = [], promus = [], touchees = {};
+  var aPrevenir = [], promus = [], touchees = {}, rappels = [];
   try {
     var sh = getSheet_();
     var props = PropertiesService.getScriptProperties();
@@ -403,10 +479,7 @@ function verifierEcheances() {
     CONFIG.SESSIONS.forEach(function (s) {
       if (maintenant > debutSession_(s)) return;
       var lignes = lireTout_(sh);
-      /* Seules les personnes qui n'ont encore jamais eu de place font
-         tomber une réservation échue (pas celles qui ont elles-mêmes
-         laissé passer leur délai). */
-      var attente = fileAttente_(lignes, s.id).filter(function (l) { return !l.facture; }).length;
+      var attente = fileAttente_(lignes, s.id).length;
 
       /* Une réservation échue ne cède sa place que si quelqu'un attend. */
       if (attente > 0) {
@@ -420,13 +493,24 @@ function verifierEcheances() {
             props.setProperty(cle, '1');
             notifierAdmin_('Paiement en retard — ' + s.label,
               l.prenom + ' ' + l.nom + ' (' + l.email + ', ligne ' + l.ligne + ') n\'a pas payé dans les ' +
-              CONFIG.RESERVATION_HEURES + ' h.\nPersonne n\'attend : sa place reste réservée. Elle passera en liste ' +
-              'd\'attente automatiquement dès qu\'une autre personne voudra la place.');
+              CONFIG.RESERVATION_HEURES + ' h.\nPersonne n\'attend : sa place reste réservée. Son inscription sera ' +
+              'désactivée automatiquement dès qu\'une autre personne voudra la place.');
           }
         });
       }
       var p = promouvoir_(sh, s.id);
       if (p.length) { promus = promus.concat(p); touchees[s.id] = 1; }
+
+      /* Rappel aux personnes confirmées, une fois, à partir de J-7 */
+      if ((debutSession_(s) - maintenant) / 86400000 <= CONFIG.RAPPEL_JOURS) {
+        lireTout_(sh).forEach(function (l) {
+          var cleR = 'rappel_' + s.id + '_' + l.email;
+          if (l.session === s.id && STATUTS_CONFIRMES.indexOf(l.statut) !== -1 && !props.getProperty(cleR)) {
+            props.setProperty(cleR, '1');
+            rappels.push(l);
+          }
+        });
+      }
 
       /* Minimum non atteint à J-7 */
       var cleMin = 'minimum_' + s.id;
@@ -446,6 +530,7 @@ function verifierEcheances() {
     lock.releaseLock();
   }
   aPrevenir.forEach(function (x) { emailExpiration_(x); });
+  rappels.forEach(function (x) { try { emailRappel_(x); } catch (e) { notifierAdmin_('⚠️ Rappel non envoyé', x.email + ' : ' + e); } });
   promus.forEach(function (x) {
     notifierAdmin_('Place réattribuée', x.prenom + ' ' + x.nom + ' (' + x.email + ') a reçu une place depuis la liste d\'attente et sa facture.');
   });
@@ -506,7 +591,28 @@ function avecVerrou_(fn) {
 function infosPratiques_(s) {
   return s.label.charAt(0).toUpperCase() + s.label.slice(1) + ', ' +
     horaire_() + '\n' +
-    CONFIG.LIEU_LIGNE1 + ', ' + CONFIG.LIEU_LIGNE2;
+    CONFIG.LIEU_LIGNE1 + ', ' + CONFIG.LIEU_LIGNE2 + '\n' +
+    CONFIG.ACCES;
+}
+
+/** Lien personnel pour réactiver une inscription désactivée. */
+function lienReactivation_(l) {
+  return ScriptApp.getService().getUrl() + '?action=reactiver&code=' + encodeURIComponent(l.code);
+}
+
+function emailRappel_(l) {
+  var s = trouverSession_(l.session);
+  var corps =
+    'Bonjour ' + l.prenom + ',\n\n' +
+    'Plus qu\'une semaine avant l\'' + CONFIG.TITRE + ' ! Voici les informations pratiques.\n\n' +
+    infosPratiques_(s) + '\n' +
+    'Itinéraire : ' + CONFIG.MAPS + '\n\n' +
+    'À prévoir : votre ordinateur portable et son chargeur, et votre abonnement Claude Pro actif (environ 20 CHF par mois). ' +
+    'Le repas de midi, les boissons et les cafés sont offerts.\n\n' +
+    'Pour gagner du temps l\'après-midi, pensez déjà à une tâche de votre quotidien que vous aimeriez confier à l\'IA.\n\n' +
+    'Un empêchement ? Répondez simplement à cet e-mail.\n\n' +
+    'À bientôt,\nEve Schaller\nAgence Curcuma';
+  envoyer_(l.email, 'Plus qu\'une semaine — ' + CONFIG.TITRE + ' du ' + s.label, corps, [icsBlob_(s)]);
 }
 
 function emailFacture_(l, s, echeance, pdf, promotion) {
@@ -536,11 +642,12 @@ function emailConfirmation_(l, s, facture) {
     'Bonjour ' + l.prenom + ',\n\n' +
     'Votre place à l\'' + CONFIG.TITRE + ' est confirmée. Je me réjouis de vous accueillir !\n\n' +
     infosPratiques_(s) + '\n\n' +
+    'Itinéraire : ' + CONFIG.MAPS + '\n\n' +
     'Le fichier joint ajoute la journée à votre agenda.\n\n' +
     (facture ? 'Vous trouverez aussi la facture, à transmettre à votre caisse de chômage.\n\n' : '') +
     'À prévoir : votre ordinateur portable et votre abonnement Claude Pro actif (environ 20 CHF par mois). ' +
     'Le repas de midi, les boissons et les cafés sont offerts. Vous repartez avec une attestation de participation.\n\n' +
-    'Je vous envoie les dernières informations pratiques quelques jours avant.\n\n' +
+    'Je vous envoie un rappel une semaine avant.\n\n' +
     'À bientôt,\nEve Schaller\nAgence Curcuma';
   envoyer_(l.email, 'Votre place est confirmée — ' + CONFIG.TITRE + ' du ' + s.label, corps, facture ? [icsBlob_(s), facture] : [icsBlob_(s)]);
 }
@@ -574,12 +681,15 @@ function emailExpiration_(l) {
   if (!s) return;
   var corps =
     'Bonjour ' + l.prenom + ',\n\n' +
-    'Je n\'ai pas encore reçu votre paiement pour l\'' + CONFIG.TITRE + ' du ' + s.label + '. ' +
-    'Comme une autre personne attendait, la place lui a été proposée et votre inscription passe en liste d\'attente.\n\n' +
-    'Si vous venez de payer, pas d\'inquiétude : écrivez-moi en répondant à cet e-mail et nous trouvons une solution ' +
-    '(place sur cette date si elle se libère, ou sur une prochaine date).\n\n' +
+    'Je n\'ai pas reçu votre paiement pour l\'' + CONFIG.TITRE + ' du ' + s.label + ' dans le délai de ' +
+    CONFIG.RESERVATION_HEURES + ' heures. Comme une autre personne souhaitait la place, elle lui a été attribuée ' +
+    'et votre inscription est annulée.\n\n' +
+    'Vous souhaitez toujours venir ? Réactivez votre inscription en un clic :\n' + lienReactivation_(l) + '\n\n' +
+    'S\'il reste une place, elle vous est réservée à nouveau pour ' + CONFIG.RESERVATION_HEURES + ' heures, avec votre facture. ' +
+    'Sinon, vous êtes inscrit·e en liste d\'attente.\n\n' +
+    'Vous avez déjà payé ? Répondez simplement à cet e-mail, nous trouvons une solution.\n\n' +
     'À bientôt,\nEve Schaller\nAgence Curcuma';
-  envoyer_(l.email, 'Votre réservation — ' + CONFIG.TITRE + ' du ' + s.label, corps);
+  envoyer_(l.email, 'Inscription annulée — ' + CONFIG.TITRE + ' du ' + s.label, corps);
 }
 
 function notifierAdmin_(sujet, corps) {
@@ -642,6 +752,7 @@ function majAgenda_(sessionId) {
       '\n\nRéservées, paiement attendu :\n' + (res.map(function (l) { return '· ' + l.prenom + ' ' + l.nom + (l.chomage ? ' (chômage, en attente de l\'ORP)' : ' (jusqu\'au ' + horodate_(l.reserveeJusqu) + ')'); }).join('\n') || '—') +
       '\n\nListe d\'attente :\n' + (att.map(function (l) { return '· ' + l.prenom + ' ' + l.nom; }).join('\n') || '—') +
       '\n\nPré-inscriptions (ORP pas encore validé) :\n' + (pre.map(function (l) { return '· ' + l.prenom + ' ' + l.nom + ' — ' + l.caisse; }).join('\n') || '—') +
+      '\n\nInscriptions désactivées (jamais payées, réactivables) :\n' + (lignes.filter(function (l) { return l.statut === ST.DESACTIVEE; }).map(function (l) { return '· ' + l.prenom + ' ' + l.nom; }).join('\n') || '—') +
       '\n\nMis à jour automatiquement depuis la feuille d\'inscriptions.');
   } catch (err) {
     notifierAdmin_('⚠️ Agenda non mis à jour', String(err));
@@ -977,7 +1088,7 @@ function objet_(v, r) {
     statut: String(g(COL.STATUT) || '').trim().toUpperCase(),
     reserveeJusqu: g(COL.RESERVEE_JUSQU), paiementRecu: g(COL.PAIEMENT_RECU) === true,
     facture: String(g(COL.FACTURE) || ''), confirmEnvoyee: g(COL.CONFIRM_ENVOYEE) === true,
-    entreeAttente: g(COL.ENTREE_ATTENTE),
+    entreeAttente: g(COL.ENTREE_ATTENTE), code: String(g(COL.CODE) || ''),
     chomage: String(g(COL.CHOMAGE) || '').toLowerCase() === 'oui',
     caisse: String(g(COL.CAISSE) || ''), validation: String(g(COL.VALIDATION_ORP) || '')
   };
@@ -1122,11 +1233,11 @@ function initialiserFeuille() {
   sh.setRowHeight(1, 44);
   sh.setFrozenRows(1);
   sh.setFrozenColumns(5);
-  var larg = [130, 120, 170, 110, 110, 210, 170, 60, 120, 280, 85, 90, 90, 180, 130, 160, 130, 90, 130, 120, 100, 140, 220, 320];
+  var larg = [130, 120, 170, 110, 110, 210, 170, 60, 120, 280, 85, 90, 90, 180, 130, 160, 130, 90, 130, 120, 100, 140, 220, 320, 120];
   larg.forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
   var n = Math.max(sh.getMaxRows() - 1, 300);
   sh.getRange(2, COL.STATUT, n, 1).setDataValidation(SpreadsheetApp.newDataValidation()
-    .requireValueInList([ST.RESERVEE, ST.PAYEE, ST.PEC, ST.ATTENTE, ST.PREINSCR, ST.ANNULEE], true).setAllowInvalid(false).build());
+    .requireValueInList([ST.RESERVEE, ST.PAYEE, ST.PEC, ST.ATTENTE, ST.PREINSCR, ST.DESACTIVEE, ST.ANNULEE], true).setAllowInvalid(false).build());
   sh.getRange(2, COL.SESSION, n, 1).setDataValidation(SpreadsheetApp.newDataValidation()
     .requireValueInList(CONFIG.SESSIONS.map(function (s) { return s.id; }), true).setAllowInvalid(false).build());
   /* Pas de cases à cocher pré-remplies : une case vide compte comme une
@@ -1142,7 +1253,7 @@ function initialiserFeuille() {
   };
   sh.setConditionalFormatRules([
     regle(ST.PAYEE, '#D6F5DC', '#0B5323'), regle(ST.PEC, '#D6F5DC', '#0B5323'),
-    regle(ST.RESERVEE, '#FDE6C9', '#7A3E00'), regle(ST.ATTENTE, '#E8EAED', '#3C4043'), regle(ST.PREINSCR, '#DCE6F7', '#243A63'),
+    regle(ST.RESERVEE, '#FDE6C9', '#7A3E00'), regle(ST.ATTENTE, '#E8EAED', '#3C4043'), regle(ST.PREINSCR, '#DCE6F7', '#243A63'), regle(ST.DESACTIVEE, '#F3E8E0', '#8A5A3C'),
     regle(ST.ANNULEE, '#FAD2CF', '#7A0C0C')
   ]);
 }
