@@ -24,7 +24,21 @@ Vérification automatique toutes les heures.
 - **Paiement reçu** → cocher la case « Paiement reçu ». Statut `PAYEE`, e-mail de confirmation avec le rendez-vous pour l'agenda.
 - **Courrier de l'ORP** → mettre le statut sur `PRISE_EN_CHARGE`. Même effet, sans attendre le paiement. Si l'ORP refuse : statut `ANNULEE` (la place passe à la personne suivante).
 - **Annulation** → statut `ANNULEE`. La place va automatiquement à la première personne en liste d'attente.
-- Menu **Journée IA** : voir les places, renvoyer une facture, forcer une vérification.
+- Menu **Atelier IA** : voir les places, renvoyer une facture, forcer une vérification.
+
+### Annuler une date (minimum non atteint, maladie…)
+
+Menu **Atelier IA ▸ ❌ Annuler une date** : choisir la date, puis le motif (OUI = minimum non atteint, NON = empêchement de ta part). Utilisable à tout moment, même la veille.
+
+- La date est fermée sur le site (« Date annulée »), plus de rappel ni d'e-mail automatique pour elle, l'événement de l'agenda devient « ANNULÉ ».
+- Chaque personne reçoit un e-mail adapté, avec des liens personnels :
+  - **a payé** → « Reporter sur une autre date » (place confirmée sans repayer) ou « Être remboursé·e » ;
+  - **prise en charge chômage** → reporter, ou annuler son inscription ;
+  - **paiement pas encore reçu** → ne pas payer la facture, report possible (nouvelle facture) ;
+  - **liste d'attente / pré-inscription** → report possible.
+- Tu reçois un récapitulatif, puis un e-mail à chaque choix.
+- Remboursement demandé → statut `A_REMBOURSER` (rouge) : fais le virement, puis mets `ANNULEE`.
+- Sans réponse : la ligne reste en `DATE_ANNULEE` (jaune), l'e-mail annonce que tu rembourses par défaut.
 
 ## Installation (une fois, ~10 minutes)
 
@@ -51,4 +65,4 @@ Après chaque modification du code : Déployer ▸ Gérer les déploiements ▸ 
 
 ## Testé avant livraison
 
-Simulation complète hors ligne (52 vérifications : chômage, pré-inscription ORP, désactivation et réactivation par lien, rappel J-7) : 5 inscriptions, paiement, prise en charge, double clic sur « payé », réservations échues, liste d'attente, nouvelle inscription sur réservation échue, paiement tardif sur date pleine, annulation, alerte minimum, clôture la veille. Le contenu du QR est identique à celui de la bibliothèque de référence `qrbill`, et le QR du PDF est relu correctement.
+Simulation complète hors ligne (75 vérifications : chômage, pré-inscription ORP, désactivation et réactivation par lien, rappel J-7, annulation d'une date avec report et remboursement) : 5 inscriptions, paiement, prise en charge, double clic sur « payé », réservations échues, liste d'attente, nouvelle inscription sur réservation échue, paiement tardif sur date pleine, annulation, alerte minimum, clôture la veille. Le contenu du QR est identique à celui de la bibliothèque de référence `qrbill`, et le QR du PDF est relu correctement.

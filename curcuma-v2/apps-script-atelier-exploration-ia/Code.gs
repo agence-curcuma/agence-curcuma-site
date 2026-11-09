@@ -81,6 +81,8 @@ var ST = {
   ATTENTE  : 'LISTE_ATTENTE',
   PREINSCR : 'PREINSCRIPTION_ORP', // chômage, ORP pas encore validé : ni place ni facture
   DESACTIVEE: 'DESACTIVEE',        // réservation non payée cédée à quelqu'un d'autre ; réactivable par lien
+  DATE_ANNULEE: 'DATE_ANNULEE',    // date annulée par Eve : en attente du choix (report ou remboursement)
+  REMBOURSER: 'A_REMBOURSER',      // date annulée, la personne a choisi le remboursement
   ANNULEE  : 'ANNULEE'
 };
 var STATUTS_ACTIFS     = [ST.RESERVEE, ST.PAYEE, ST.PEC];   // occupent une place
@@ -109,7 +111,11 @@ var LAST_COL = HEADERS.length;
 
 /** État des places pour le calendrier de la page. */
 function doGet(e) {
-  if (e && e.parameter && e.parameter.action === 'reactiver') return reactiver_(e.parameter.code);
+  var a = e && e.parameter ? e.parameter.action : '';
+  if (a === 'reactiver') return reactiver_(e.parameter.code);
+  if (a === 'choix') return pageChoix_(e.parameter.code);
+  if (a === 'report') return reporter_(e.parameter.code, e.parameter.session);
+  if (a === 'rembourser') return choisirRemboursement_(e.parameter.code);
   try {
     var sh = getSheet_();
     var lignes = lireTout_(sh);
@@ -124,7 +130,8 @@ function doGet(e) {
           places_restantes: Math.max(0, CONFIG.PLACES_MAX - actives),
           liste_attente: actives >= CONFIG.PLACES_MAX,
           complet: compter_(lignes, s.id, STATUTS_CONFIRMES) >= CONFIG.PLACES_MAX,
-          ouverte: maintenant < clotureSession_(s)
+          ouverte: estOuverte_(s),
+          annulee: dateAnnulee_(s)
         };
       })
     });
@@ -157,7 +164,7 @@ function doPost(e) {
     var preinscription = p.chomage === 'oui' && p.validation !== 'oui';
     var s = trouverSession_(p.session);
     if (!s) return json_({ status: 'ERREUR', message: 'Merci de choisir une date.' });
-    if (new Date() >= clotureSession_(s)) {
+    if (!estOuverte_(s)) {
       return json_({ status: 'ERREUR', message: 'Les inscriptions pour cette date sont fermées.' });
     }
     if (!p.prenom || !p.nom) return json_({ status: 'ERREUR', message: 'Le prénom et le nom sont obligatoires.' });
@@ -251,7 +258,7 @@ function reactiver_(code) {
       msg = ['Lien inconnu', 'Ce lien n\'est pas valable. Écrivez-moi à ' + CONFIG.ADMIN_EMAIL + ', je regarde avec vous.'];
     } else if (l.statut !== ST.DESACTIVEE) {
       msg = ['C\'est déjà fait', 'Votre inscription au ' + s.label + ' est déjà active (' + libelleStatut_(l.statut) + '). Rien d\'autre à faire.'];
-    } else if (new Date() >= clotureSession_(s)) {
+    } else if (!estOuverte_(s)) {
       msg = ['Inscriptions fermées', 'Les inscriptions pour le ' + s.label + ' sont fermées. Les prochaines dates sont sur ' + CONFIG.URL_PAGE];
     } else {
       var libres = CONFIG.PLACES_MAX - compter_(lireTout_(sh), s.id, STATUTS_ACTIFS);
@@ -281,12 +288,12 @@ function reactiver_(code) {
 }
 
 function libelleStatut_(st) {
-  return ({ RESERVEE_72H: 'place réservée', PAYEE: 'place confirmée', PRISE_EN_CHARGE: 'place confirmée',
+  return ({ RESERVEE_72H: 'place réservée', PAYEE: 'place confirmée', PRISE_EN_CHARGE: 'place confirmée', A_REMBOURSER: 'remboursement demandé',
     LISTE_ATTENTE: 'liste d\'attente', PREINSCRIPTION_ORP: 'pré-inscription', ANNULEE: 'annulée' })[st] || st;
 }
 
 /** Petite page de réponse aux couleurs du site. */
-function pageReponse_(titre, texte) {
+function pageReponse_(titre, texte, extra) {
   var esc = function (x) { return String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;'); };
   var html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;800&display=swap" rel="stylesheet"></head>' +
@@ -294,11 +301,222 @@ function pageReponse_(titre, texte) {
     '<div style="max-width:560px;margin:12vh auto;padding:32px 24px;background:#14213d;border-radius:28px;color:#f7f1e3">' +
     '<p style="margin:0 0 12px;color:#f2ff49;font-weight:800;letter-spacing:.18em;text-transform:uppercase;font-size:12px">' + esc(CONFIG.TITRE) + '</p>' +
     '<h1 style="margin:0 0 14px;color:#fff;font-size:28px;line-height:1.15">' + esc(titre) + '</h1>' +
-    '<p style="margin:0 0 22px;line-height:1.6;color:rgba(247,241,227,.85)">' + esc(texte) + '</p>' +
+    '<p style="margin:0 0 22px;line-height:1.6;color:rgba(247,241,227,.85)">' + esc(texte) + '</p>' + (extra || '') +
     '<a href="' + CONFIG.URL_PAGE + '" style="display:inline-block;background:#f2ff49;color:#14213d;font-weight:800;text-decoration:none;padding:12px 22px;border-radius:999px">Voir l\'atelier</a>' +
     '</div></body></html>';
   return HtmlService.createHtmlOutput(html).setTitle(CONFIG.TITRE)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+
+/* ==========================================================================
+   2b. ANNULATION D'UNE DATE PAR EVE (minimum non atteint, maladie…)
+   ========================================================================== */
+
+function dateAnnulee_(s) { return !!PropertiesService.getScriptProperties().getProperty('annulee_' + s.id); }
+function estOuverte_(s) { return new Date() < clotureSession_(s) && !dateAnnulee_(s); }
+
+/** Menu « Annuler une date » : choix de la date et du motif, puis e-mails. */
+function actionAnnulerDate() {
+  var ui = SpreadsheetApp.getUi();
+  var dispo = CONFIG.SESSIONS.filter(function (s) { return !dateAnnulee_(s) && new Date() < finSession_(s); });
+  if (!dispo.length) return alerte_('Aucune date à venir à annuler.');
+  var rep = ui.prompt('Annuler une date',
+    'Quelle date annuler ? Tape son numéro :\n\n' + dispo.map(function (s, i) { return (i + 1) + '. ' + s.label; }).join('\n'),
+    ui.ButtonSet.OK_CANCEL);
+  if (rep.getSelectedButton() !== ui.Button.OK) return;
+  var s = dispo[parseInt(rep.getResponseText(), 10) - 1];
+  if (!s) return alerte_('Numéro inconnu, rien n\'a été annulé.');
+  var motif = ui.alert('Motif', 'Le minimum de participant·e·s n\'est-il pas atteint ?\n\nOUI = minimum non atteint\nNON = empêchement de ma part (maladie…)', ui.ButtonSet.YES_NO_CANCEL);
+  if (motif === ui.Button.CANCEL || motif === ui.Button.CLOSE) return;
+  var ok = ui.alert('Confirmer', 'Annuler définitivement le ' + s.label + ' et écrire à toutes les personnes inscrites ?', ui.ButtonSet.YES_NO);
+  if (ok !== ui.Button.YES) return;
+  var n = annulerDate_(s.id, motif === ui.Button.YES ? 'minimum' : 'empechement');
+  alerte_('Le ' + s.label + ' est annulé. ' + n + ' personne(s) prévenue(s). Le récapitulatif t\'a été envoyé par e-mail.');
+}
+
+/** Annule une date, prévient chaque personne concernée, envoie le récapitulatif à Eve. */
+function annulerDate_(sessionId, motif) {
+  var s = trouverSession_(sessionId), props = PropertiesService.getScriptProperties();
+  var aEcrire = [];
+  avecVerrou_(function () {
+    props.setProperty('annulee_' + s.id, motif);
+    var sh = getSheet_();
+    lireTout_(sh).forEach(function (l) {
+      if (l.session !== s.id) return;
+      if ([ST.PAYEE, ST.PEC, ST.RESERVEE, ST.ATTENTE, ST.PREINSCR].indexOf(l.statut) === -1) return;
+      l.code = l.code || Utilities.getUuid().replace(/-/g, '');
+      sh.getRange(l.ligne, COL.CODE).setValue(l.code);
+      props.setProperty('avant_' + l.code, l.statut);
+      sh.getRange(l.ligne, COL.STATUT).setValue(ST.DATE_ANNULEE);
+      tracer_(sh, l.ligne, 'date annulée par Eve (' + motif + ') — ancien statut : ' + l.statut);
+      aEcrire.push(l);
+    });
+    SpreadsheetApp.flush();
+  });
+  aEcrire.forEach(function (l) { try { emailDateAnnulee_(l, s, motif); } catch (e) { notifierAdmin_('⚠️ E-mail d\'annulation non envoyé', l.email + ' : ' + e); } });
+  var groupe = function (st) { return aEcrire.filter(function (l) { return props.getProperty('avant_' + l.code) === st; }); };
+  var liste = function (arr) { return arr.map(function (l) { return '· ' + l.prenom + ' ' + l.nom + ' <' + l.email + '>'; }).join('\n') || '—'; };
+  notifierAdmin_('❌ Date annulée — ' + s.label,
+    'Le ' + s.label + ' est annulé (' + (motif === 'minimum' ? 'minimum non atteint' : 'empêchement') + '). Chacun·e a reçu un e-mail.\n\n' +
+    'Ont payé (choix : report ou remboursement) :\n' + liste(groupe(ST.PAYEE)) + '\n\n' +
+    'Prise en charge chômage (choix : report ou annulation) :\n' + liste(groupe(ST.PEC)) + '\n\n' +
+    'Paiement pas encore reçu (invité·e·s à ne pas payer, report possible) :\n' + liste(groupe(ST.RESERVEE)) + '\n\n' +
+    'Liste d\'attente et pré-inscriptions (report possible) :\n' + liste(groupe(ST.ATTENTE).concat(groupe(ST.PREINSCR))) + '\n\n' +
+    'Chaque choix t\'est notifié. Pour les remboursements : statut A_REMBOURSER dans la feuille, puis ANNULEE une fois le virement fait.');
+  majAgenda_(s.id);
+  return aEcrire.length;
+}
+
+function lienChoix_(l, option) {
+  return ScriptApp.getService().getUrl() + '?action=' + option + '&code=' + encodeURIComponent(l.code);
+}
+
+function emailDateAnnulee_(l, s, motif) {
+  var avant = PropertiesService.getScriptProperties().getProperty('avant_' + l.code);
+  var raison = motif === 'minimum'
+    ? 'le nombre minimum de participant·e·s n\'est pas atteint'
+    : 'suite à un empêchement de ma part';
+  var debut = 'Bonjour ' + l.prenom + ',\n\n' +
+    'Je suis désolée : l\'' + CONFIG.TITRE + ' du ' + s.label + ' est annulé, ' + raison + '.\n\n';
+  var fin = '\nUne question ? Répondez simplement à cet e-mail.\n\nAvec mes excuses pour ce changement,\nEve Schaller\nAgence Curcuma';
+  var corps;
+  if (avant === ST.PAYEE) {
+    corps = debut + 'Vous avez le choix :\n\n' +
+      '→ Reporter votre place sur une autre date (sans rien repayer) :\n' + lienChoix_(l, 'choix') + '\n\n' +
+      '→ Être remboursé·e intégralement (' + montantTexte_() + ') :\n' + lienChoix_(l, 'rembourser') + '\n\n' +
+      'Sans nouvelles de votre part, je vous rembourse.\n' + fin;
+  } else if (avant === ST.PEC) {
+    corps = debut + 'Vous avez le choix :\n\n' +
+      '→ Reporter votre place sur une autre date, toujours avec votre caisse de chômage :\n' + lienChoix_(l, 'choix') + '\n\n' +
+      '→ Annuler votre inscription :\n' + lienChoix_(l, 'rembourser') + '\n\n' +
+      'Si votre caisse a déjà réglé la facture, je la lui rembourse.\n' + fin;
+  } else if (avant === ST.RESERVEE) {
+    corps = debut + (l.chomage ? 'Merci de prévenir votre caisse de chômage que cette facture est annulée.\n\n'
+      : 'Merci de ne pas payer la facture reçue. Si vous l\'avez déjà réglée, répondez à cet e-mail : je vous rembourse.\n\n') +
+      'Vous souhaitez venir à une autre date ? Choisissez-la ici :\n' + lienChoix_(l, 'choix') + '\n' + fin;
+  } else {
+    corps = debut + 'Vous étiez ' + (avant === ST.PREINSCR ? 'pré-inscrit·e' : 'en liste d\'attente') + ' pour cette date. ' +
+      'Vous pouvez reporter votre inscription sur une autre date ici :\n' + lienChoix_(l, 'choix') + '\n' + fin;
+  }
+  envoyer_(l.email, 'Date annulée — ' + CONFIG.TITRE + ' du ' + s.label, corps);
+}
+
+/** Lit la ligne d'une personne touchée par une annulation à partir de son code. */
+function ligneParCode_(sh, code) {
+  code = String(code || '').replace(/[^a-f0-9]/gi, '');
+  return code ? lireTout_(sh).filter(function (x) { return x.code === code; })[0] || null : null;
+}
+
+/** Page de choix de la nouvelle date. */
+function pageChoix_(code) {
+  var sh = getSheet_(), l = ligneParCode_(sh, code);
+  if (!l) return pageReponse_('Lien inconnu', 'Ce lien n\'est pas valable. Écrivez-moi à ' + CONFIG.ADMIN_EMAIL + '.');
+  if (l.statut !== ST.DATE_ANNULEE) return pageReponse_('C\'est déjà fait', 'Votre choix est déjà enregistré (' + libelleStatut_(l.statut) + ').');
+  var avant = PropertiesService.getScriptProperties().getProperty('avant_' + l.code);
+  var placeExigee = avant === ST.PAYEE || avant === ST.PEC;
+  var lignes = lireTout_(sh);
+  var options = CONFIG.SESSIONS.filter(function (s) { return s.id !== l.session && estOuverte_(s); }).map(function (s) {
+    var libres = CONFIG.PLACES_MAX - compter_(lignes, s.id, STATUTS_ACTIFS);
+    return { s: s, libres: libres };
+  }).filter(function (o) { return !placeExigee || o.libres > 0; });
+  if (!options.length) {
+    return pageReponse_('Pas encore de date disponible', 'Aucune autre date n\'a de place libre pour l\'instant. Répondez à mon e-mail : ' +
+      'je vous propose une date dès qu\'elle est ouverte' + (avant === ST.PAYEE ? ', ou je vous rembourse si vous préférez.' : '.'));
+  }
+  var liens = options.map(function (o) {
+    return '<a href="' + lienChoix_(l, 'report') + '&session=' + o.s.id + '" style="display:block;margin:0 0 10px;padding:14px 18px;border:2px solid #f2ff49;border-radius:16px;color:#fff;text-decoration:none;font-weight:800">' +
+      o.s.label.charAt(0).toUpperCase() + o.s.label.slice(1) +
+      '<span style="display:block;font-weight:400;color:rgba(247,241,227,.8);font-size:14px">' +
+      (o.libres > 0 ? o.libres + ' place(s) disponible(s)' : 'Complet : liste d\'attente') + '</span></a>';
+  }).join('');
+  return pageReponse_('Choisir une nouvelle date', 'Cliquez sur la date qui vous convient :', liens);
+}
+
+/** Déplace l'inscription sur une autre date. */
+function reporter_(code, sessionId) {
+  var props = PropertiesService.getScriptProperties();
+  var msg, notif = null, l = null, s2 = null, s1 = null;
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(20000)) return pageReponse_('Un instant…', 'Le service est occupé. Merci de réessayer dans une minute.');
+  try {
+    var sh = getSheet_();
+    l = ligneParCode_(sh, code);
+    s2 = trouverSession_(sessionId);
+    if (!l) { msg = ['Lien inconnu', 'Ce lien n\'est pas valable.']; }
+    else if (l.statut !== ST.DATE_ANNULEE) { msg = ['C\'est déjà fait', 'Votre choix est déjà enregistré (' + libelleStatut_(l.statut) + ').']; }
+    else if (!s2 || s2.id === l.session || !estOuverte_(s2)) { msg = ['Date indisponible', 'Cette date n\'est pas ouverte. Revenez au lien de l\'e-mail pour en choisir une autre.']; }
+    else {
+      s1 = trouverSession_(l.session);
+      var avant = props.getProperty('avant_' + l.code);
+      var libres = CONFIG.PLACES_MAX - compter_(lireTout_(sh), s2.id, STATUTS_ACTIFS);
+      sh.getRange(l.ligne, COL.SESSION).setValue(s2.id);
+      sh.getRange(l.ligne, COL.DATE_COURS).setValue(s2.label);
+      tracer_(sh, l.ligne, 'report choisi : ' + s1.label + ' → ' + s2.label);
+      if ((avant === ST.PAYEE || avant === ST.PEC) && libres > 0) {
+        sh.getRange(l.ligne, COL.STATUT).setValue(avant);
+        sh.getRange(l.ligne, COL.CONFIRM_ENVOYEE).setValue(false);
+        SpreadsheetApp.flush();
+        var l2 = lireLigne_(sh, l.ligne);
+        emailConfirmation_(l2, s2, null);
+        sh.getRange(l.ligne, COL.CONFIRM_ENVOYEE).setValue(true);
+        msg = ['C\'est noté !', 'Votre place est confirmée pour le ' + s2.label + '. Vous recevez la confirmation par e-mail.'];
+        notif = 'place confirmée sur la nouvelle date (' + (avant === ST.PAYEE ? 'déjà payée' : 'prise en charge') + ')';
+      } else if (avant === ST.PREINSCR) {
+        sh.getRange(l.ligne, COL.STATUT).setValue(ST.PREINSCR);
+        msg = ['C\'est noté !', 'Votre pré-inscription est reportée au ' + s2.label + '. Votre place est confirmée dès que l\'ORP a validé la formation, s\'il en reste une.'];
+        notif = 'pré-inscription reportée';
+      } else if (libres > 0 && avant !== ST.ATTENTE) {
+        attribuerPlace_(sh, l.ligne, false);
+        msg = ['C\'est noté !', 'Votre place est réservée pour le ' + s2.label + '. Vous recevez la nouvelle facture par e-mail.'];
+        notif = 'place réservée sur la nouvelle date (nouvelle facture)';
+      } else if (libres > 0) {
+        attribuerPlace_(sh, l.ligne, true);
+        msg = ['C\'est noté !', 'Une place est libre le ' + s2.label + ' : elle est à vous. Vous recevez la facture par e-mail.'];
+        notif = 'place attribuée sur la nouvelle date';
+      } else {
+        sh.getRange(l.ligne, COL.STATUT).setValue(ST.ATTENTE);
+        sh.getRange(l.ligne, COL.ENTREE_ATTENTE).setValue(new Date());
+        msg = ['Liste d\'attente', 'Le ' + s2.label + ' est complet : vous êtes en liste d\'attente et recevrez la prochaine place libre.'];
+        notif = 'liste d\'attente sur la nouvelle date' + (avant === ST.PAYEE ? ' — ATTENTION : avait déjà payé' : '');
+      }
+      SpreadsheetApp.flush();
+    }
+  } finally {
+    lock.releaseLock();
+  }
+  if (notif) {
+    notifierAdmin_('Report choisi — ' + l.prenom + ' ' + l.nom, l.prenom + ' ' + l.nom + ' (' + l.email + ') : ' + s1.label + ' → ' + s2.label + '\n' + notif + '.');
+    majAgenda_(s1.id); majAgenda_(s2.id);
+    verifierComplet_(getSheet_(), s2);
+  }
+  return pageReponse_(msg[0], msg[1]);
+}
+
+/** Choix « remboursement » (ou « annuler mon inscription » pour la prise en charge). */
+function choisirRemboursement_(code) {
+  var sh = getSheet_(), l = ligneParCode_(sh, code);
+  if (!l) return pageReponse_('Lien inconnu', 'Ce lien n\'est pas valable.');
+  if (l.statut !== ST.DATE_ANNULEE) return pageReponse_('C\'est déjà fait', 'Votre choix est déjà enregistré (' + libelleStatut_(l.statut) + ').');
+  var avant = PropertiesService.getScriptProperties().getProperty('avant_' + l.code);
+  var s = trouverSession_(l.session);
+  if (avant === ST.PAYEE) {
+    sh.getRange(l.ligne, COL.STATUT).setValue(ST.REMBOURSER);
+    tracer_(sh, l.ligne, 'remboursement choisi');
+    envoyer_(l.email, 'Remboursement — ' + CONFIG.TITRE + ' du ' + s.label,
+      'Bonjour ' + l.prenom + ',\n\nC\'est noté : je vous rembourse ' + montantTexte_() + ' dans les 10 jours, sur le compte depuis lequel vous avez payé. ' +
+      'Si vous préférez un autre compte, répondez à cet e-mail.\n\nJ\'espère vous accueillir à une prochaine date !\n\nEve Schaller\nAgence Curcuma');
+    notifierAdmin_('💸 À rembourser — ' + l.prenom + ' ' + l.nom, l.prenom + ' ' + l.nom + ' (' + l.email + ') demande le remboursement de ' +
+      montantTexte_() + ' (facture ' + l.facture + ', ' + s.label + ').\nUne fois le virement fait, mets le statut sur ANNULEE.');
+    majAgenda_(s.id);
+    return pageReponse_('C\'est noté', 'Vous serez remboursé·e de ' + montantTexte_() + ' dans les 10 jours. Une confirmation vous a été envoyée par e-mail.');
+  }
+  sh.getRange(l.ligne, COL.STATUT).setValue(ST.ANNULEE);
+  tracer_(sh, l.ligne, 'inscription annulée par la personne après annulation de la date');
+  notifierAdmin_('Inscription annulée — ' + l.prenom + ' ' + l.nom, l.prenom + ' ' + l.nom + ' (' + l.email + ') ne reporte pas.' +
+    (avant === ST.PEC ? '\nPrise en charge chômage : pense à prévenir la caisse (' + l.caisse + ') si la facture a été réglée.' : ''));
+  majAgenda_(s.id);
+  return pageReponse_('C\'est noté', 'Votre inscription est annulée. J\'espère vous accueillir à une prochaine date !');
 }
 
 
@@ -477,7 +695,7 @@ function verifierEcheances() {
     var maintenant = new Date();
 
     CONFIG.SESSIONS.forEach(function (s) {
-      if (maintenant > debutSession_(s)) return;
+      if (maintenant > debutSession_(s) || dateAnnulee_(s)) return;
       var lignes = lireTout_(sh);
       var attente = fileAttente_(lignes, s.id).length;
 
@@ -747,6 +965,13 @@ function majAgenda_(sessionId) {
     var res = lignes.filter(function (l) { return l.statut === ST.RESERVEE; });
     var att = fileAttente_(lignes, s.id);
     var pre = lignes.filter(function (l) { return l.statut === ST.PREINSCR; });
+    if (dateAnnulee_(s)) {
+      ev.setTitle('ANNULÉ — ' + CONFIG.TITRE);
+      ev.setDescription('Date annulée.\n\nChoix en attente :\n' +
+        (lignes.filter(function (l) { return l.statut === ST.DATE_ANNULEE; }).map(function (l) { return '· ' + l.prenom + ' ' + l.nom; }).join('\n') || '—') +
+        '\n\nÀ rembourser :\n' + (lignes.filter(function (l) { return l.statut === ST.REMBOURSER; }).map(function (l) { return '· ' + l.prenom + ' ' + l.nom; }).join('\n') || '—'));
+      return;
+    }
     ev.setTitle(CONFIG.TITRE + ' — ' + conf.length + '/' + CONFIG.PLACES_MAX + ' confirmées' + (res.length ? ' (+' + res.length + ' en attente de paiement)' : ''));
     ev.setDescription(
       'Confirmées :\n' + (conf.map(function (l) { return '· ' + l.prenom + ' ' + l.nom + (l.statut === ST.PEC ? ' (prise en charge)' : ''); }).join('\n') || '—') +
@@ -1201,6 +1426,8 @@ function onOpen() {
     .addItem('🔄 Vérifier maintenant (échéances, liste d\'attente)', 'verifierEcheances')
     .addItem('🗓️ Mettre à jour l\'agenda', 'actionMajAgenda')
     .addSeparator()
+    .addItem('❌ Annuler une date (prévient tout le monde)', 'actionAnnulerDate')
+    .addSeparator()
     .addItem('🛠️ Initialiser / réparer la feuille', 'initialiserFeuille')
     .addToUi();
 }
@@ -1238,7 +1465,7 @@ function initialiserFeuille() {
   larg.forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
   var n = Math.max(sh.getMaxRows() - 1, 300);
   sh.getRange(2, COL.STATUT, n, 1).setDataValidation(SpreadsheetApp.newDataValidation()
-    .requireValueInList([ST.RESERVEE, ST.PAYEE, ST.PEC, ST.ATTENTE, ST.PREINSCR, ST.DESACTIVEE, ST.ANNULEE], true).setAllowInvalid(false).build());
+    .requireValueInList([ST.RESERVEE, ST.PAYEE, ST.PEC, ST.ATTENTE, ST.PREINSCR, ST.DESACTIVEE, ST.DATE_ANNULEE, ST.REMBOURSER, ST.ANNULEE], true).setAllowInvalid(false).build());
   sh.getRange(2, COL.SESSION, n, 1).setDataValidation(SpreadsheetApp.newDataValidation()
     .requireValueInList(CONFIG.SESSIONS.map(function (s) { return s.id; }), true).setAllowInvalid(false).build());
   /* Pas de cases à cocher pré-remplies : une case vide compte comme une
@@ -1254,7 +1481,7 @@ function initialiserFeuille() {
   };
   sh.setConditionalFormatRules([
     regle(ST.PAYEE, '#D6F5DC', '#0B5323'), regle(ST.PEC, '#D6F5DC', '#0B5323'),
-    regle(ST.RESERVEE, '#FDE6C9', '#7A3E00'), regle(ST.ATTENTE, '#E8EAED', '#3C4043'), regle(ST.PREINSCR, '#DCE6F7', '#243A63'), regle(ST.DESACTIVEE, '#F3E8E0', '#8A5A3C'),
+    regle(ST.RESERVEE, '#FDE6C9', '#7A3E00'), regle(ST.ATTENTE, '#E8EAED', '#3C4043'), regle(ST.PREINSCR, '#DCE6F7', '#243A63'), regle(ST.DESACTIVEE, '#F3E8E0', '#8A5A3C'), regle(ST.DATE_ANNULEE, '#FFF3B0', '#5C4A00'), regle(ST.REMBOURSER, '#FAD2CF', '#7A0C0C'),
     regle(ST.ANNULEE, '#FAD2CF', '#7A0C0C')
   ]);
 }

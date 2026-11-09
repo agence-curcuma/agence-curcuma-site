@@ -788,7 +788,7 @@ h2 em{font-weight:500;}
       var inp=$('input',c),e=etat[inp.value],s=$('.dcard__s',c);
       c.classList.remove('is-few','is-wait','is-closed');
       if(!e){s.textContent='';return;}
-      if(!e.ouverte){c.classList.add('is-closed');inp.disabled=true;inp.checked=false;s.textContent='Inscriptions fermées';return;}
+      if(!e.ouverte){c.classList.add('is-closed');inp.disabled=true;inp.checked=false;s.textContent=e.annulee?'Date annulée':'Inscriptions fermées';return;}
       if(e.complet){c.classList.add('is-wait');s.textContent='Complet · liste d\'attente';return;}
       if(e.liste_attente){c.classList.add('is-wait');s.textContent='Liste d\'attente ouverte';return;}
       var n=e.places_restantes;
