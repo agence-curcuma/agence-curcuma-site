@@ -8,7 +8,8 @@ Système séparé de celui de la formation CREA : les deux ne se mélangent pas.
 | Moment | Ce que fait le système |
 |---|---|
 | Inscription, places libres | Ligne `RESERVEE_72H` · facture PDF + bulletin QR envoyée à la personne · copie dans Drive (« Journée IA — factures ») · e-mail à Eve · agenda mis à jour |
-| Inscription « via le chômage » | Place gardée **sans délai de 72 h** · facture à transmettre à la caisse (nom de la caisse et « ORP a déjà validé ? » dans la feuille) · e-mail à Eve marqué (chômage) |
+| Chômage, ORP **déjà** validé | Place gardée **sans délai de 72 h** · facture à transmettre à la caisse · e-mail à Eve marqué (chômage). Eve met `PRISE_EN_CHARGE` à réception du courrier de l'ORP |
+| Chômage, ORP **pas encore** validé | `PREINSCRIPTION_ORP` : aucune place bloquée, aucune facture, jamais promue automatiquement. Quand l'ORP valide, Eve met `PRISE_EN_CHARGE` : place confirmée avec la facture si une place est libre, sinon liste d'attente |
 | Inscription, 4 places occupées | Ligne `LISTE_ATTENTE` · e-mail « liste d'attente » (sans facture) |
 | 72 h sans paiement | Si une nouvelle personne attend ou s'inscrit : la place lui est donnée (avec sa facture), l'autre repasse en liste d'attente et reçoit un e-mail. Si personne n'attend : la place est gardée, Eve reçoit « Paiement en retard » |
 | 4 places confirmées | E-mail « ✅ COMPLET » à Eve (une seule fois par date) |
@@ -49,4 +50,4 @@ Après chaque modification du code : Déployer ▸ Gérer les déploiements ▸ 
 
 ## Testé avant livraison
 
-Simulation complète hors ligne (37 vérifications, dont le parcours « via le chômage ») : 5 inscriptions, paiement, prise en charge, double clic sur « payé », réservations échues, liste d'attente, nouvelle inscription sur réservation échue, paiement tardif sur date pleine, annulation, alerte minimum, clôture la veille. Le contenu du QR est identique à celui de la bibliothèque de référence `qrbill`, et le QR du PDF est relu correctement.
+Simulation complète hors ligne (46 vérifications, dont les parcours chômage et pré-inscription ORP) : 5 inscriptions, paiement, prise en charge, double clic sur « payé », réservations échues, liste d'attente, nouvelle inscription sur réservation échue, paiement tardif sur date pleine, annulation, alerte minimum, clôture la veille. Le contenu du QR est identique à celui de la bibliothèque de référence `qrbill`, et le QR du PDF est relu correctement.

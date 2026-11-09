@@ -47,7 +47,7 @@ var CONFIG = {
   URL_PAGE    : 'https://www.agence-curcuma.ch/journee-ia.html',
 
   /* --- Facturation --------------------------------------------------- */
-  PRIX     : 700,
+  PRIX     : 600,
   DEVISE   : 'CHF',
   IBAN     : 'CH04 0840 1000 0785 4260 0',
   CREANCIER: {
@@ -75,6 +75,7 @@ var ST = {
   PAYEE    : 'PAYEE',            // confirmée
   PEC      : 'PRISE_EN_CHARGE',  // confirmée sans attendre le paiement (courrier ORP)
   ATTENTE  : 'LISTE_ATTENTE',
+  PREINSCR : 'PREINSCRIPTION_ORP', // chômage, ORP pas encore validé : ni place ni facture
   ANNULEE  : 'ANNULEE'
 };
 var STATUTS_ACTIFS     = [ST.RESERVEE, ST.PAYEE, ST.PEC];   // occupent une place
@@ -147,6 +148,7 @@ function doPost(e) {
       validation: nettoyer_(data.validation_orp, 20)
     };
     if (p.chomage !== 'oui') { p.caisse = ''; p.validation = ''; }
+    var preinscription = p.chomage === 'oui' && p.validation !== 'oui';
     var s = trouverSession_(p.session);
     if (!s) return json_({ status: 'ERREUR', message: 'Merci de choisir une date.' });
     if (new Date() >= clotureSession_(s)) {
@@ -160,6 +162,9 @@ function doPost(e) {
     if (p.chomage === 'oui' && !p.caisse) {
       return json_({ status: 'ERREUR', message: 'Merci d\'indiquer votre caisse de chômage.' });
     }
+    if (p.chomage === 'oui' && p.validation !== 'oui' && p.validation !== 'pas encore') {
+      return json_({ status: 'ERREUR', message: 'Merci d\'indiquer si l\'ORP a déjà validé la formation.' });
+    }
     if (p.consentement !== 'oui') return json_({ status: 'ERREUR', message: 'L\'acceptation des conditions est nécessaire.' });
 
     var lock = LockService.getScriptLock();
@@ -172,19 +177,26 @@ function doPost(e) {
       if (lignes.some(function (l) { return l.session === s.id && l.email === p.email && l.statut !== ST.ANNULEE; })) {
         return json_({ status: 'DOUBLON' });
       }
+      /* ORP pas encore d'accord : pré-inscription, sans place ni facture. */
+      if (preinscription) {
+        var rp = ecrireInscription_(sh, p, s, ST.PREINSCR);
+        res = { ligne: rp, statut: ST.PREINSCR, actives: compter_(lignes, s.id, STATUTS_ACTIFS) };
+      }
       /* Date pleine : les réservations échues (72 h dépassées, non payées)
          cèdent leur place. Les personnes déjà en liste d'attente passent
          avant la nouvelle inscription. */
-      if (compter_(lignes, s.id, STATUTS_ACTIFS) >= CONFIG.PLACES_MAX) {
+      if (!res && compter_(lignes, s.id, STATUTS_ACTIFS) >= CONFIG.PLACES_MAX) {
         expires = expirerEchues_(sh, lignes, s.id, 99);
         if (expires.length) promouvoir_(sh, s.id, expires.map(function (x) { return x.ligne; }));
         lignes = lireTout_(sh);
       }
-      var actives = compter_(lignes, s.id, STATUTS_ACTIFS);
-      var statut = actives < CONFIG.PLACES_MAX ? ST.RESERVEE : ST.ATTENTE;
-      var r = ecrireInscription_(sh, p, s, statut);
-      res = { ligne: r, statut: statut, actives: actives };
-      if (statut === ST.RESERVEE) attribuerPlace_(sh, r, false);
+      if (!res) {
+        var actives = compter_(lignes, s.id, STATUTS_ACTIFS);
+        var statut = actives < CONFIG.PLACES_MAX ? ST.RESERVEE : ST.ATTENTE;
+        var r = ecrireInscription_(sh, p, s, statut);
+        res = { ligne: r, statut: statut, actives: actives };
+        if (statut === ST.RESERVEE) attribuerPlace_(sh, r, false);
+      }
     } finally {
       lock.releaseLock();
     }
@@ -196,6 +208,12 @@ function doPost(e) {
         resumeAdmin_(p, s, ST.RESERVEE, res.actives + 1, res.ligne));
       majAgenda_(s.id);
       return json_({ status: 'INSCRIT', places_restantes: Math.max(0, CONFIG.PLACES_MAX - res.actives - 1) });
+    }
+    if (res.statut === ST.PREINSCR) {
+      emailPreinscription_(p, s);
+      notifierAdmin_('Pré-inscription (ORP pas encore validé) — ' + s.label, resumeAdmin_(p, s, ST.PREINSCR, res.actives, res.ligne));
+      majAgenda_(s.id);
+      return json_({ status: 'PREINSCRIT' });
     }
     emailListeAttente_(p, s);
     notifierAdmin_('Liste d\'attente — ' + s.label, resumeAdmin_(p, s, ST.ATTENTE, res.actives, res.ligne));
@@ -308,9 +326,29 @@ function confirmer_(sh, r, statutCible) {
       '(changer la colonne Session puis cocher à nouveau « Paiement reçu »).');
     return;
   }
+  if (statutCible === ST.PEC && l.chomage) sh.getRange(r, COL.VALIDATION_ORP).setValue('oui');
+  /* ORP d'accord mais date pleine : la personne passe en liste d'attente
+     (elle aura la prochaine place libre, comme les autres). */
   if (!dejaPlace && occupees >= CONFIG.PLACES_MAX) {
-    notifierAdmin_('Attention : ' + (occupees + 1) + ' personnes le ' + s.label,
-      l.prenom + ' ' + l.nom + ' a été confirmé·e alors que les ' + CONFIG.PLACES_MAX + ' places étaient déjà occupées.');
+    sh.getRange(r, COL.STATUT).setValue(ST.ATTENTE);
+    sh.getRange(r, COL.ENTREE_ATTENTE).setValue(new Date());
+    tracer_(sh, r, 'validation ORP reçue mais date pleine → liste d\'attente');
+    SpreadsheetApp.flush();
+    emailListeAttente_(l, s);
+    notifierAdmin_('Date pleine — ' + l.prenom + ' ' + l.nom + ' en liste d\'attente',
+      'La validation de l\'ORP est notée, mais les ' + CONFIG.PLACES_MAX + ' places du ' + s.label + ' sont occupées.\n' +
+      l.prenom + ' ' + l.nom + ' est en liste d\'attente et recevra la prochaine place libre.');
+    majAgenda_(s.id);
+    return;
+  }
+  /* Prise en charge sans facture encore envoyée (pré-inscription) :
+     la facture part avec la confirmation, pour la caisse de chômage. */
+  var factureJointe = null;
+  if (statutCible === ST.PEC && !l.facture) {
+    l.facture = prochainNumeroFacture_();
+    sh.getRange(r, COL.FACTURE).setValue(l.facture);
+    factureJointe = factureBlob_(l, s, l.facture, new Date(), new Date());
+    try { dossierFactures_().createFile(factureJointe.copyBlob()); } catch (e) {}
   }
 
   var maintenant = new Date();
@@ -324,7 +362,7 @@ function confirmer_(sh, r, statutCible) {
   if (l.confirmEnvoyee) {
     tracer_(sh, r, 'statut → ' + statutCible + ' (confirmation déjà envoyée, pas de second e-mail)');
   } else {
-    emailConfirmation_(l, s);
+    emailConfirmation_(l, s, factureJointe);
     sh.getRange(r, COL.CONFIRM_ENVOYEE).setValue(true);
     tracer_(sh, r, 'statut → ' + statutCible + ' + e-mail de confirmation envoyé');
   }
@@ -493,17 +531,30 @@ function emailFacture_(l, s, echeance, pdf, promotion) {
     corps, [pdf]);
 }
 
-function emailConfirmation_(l, s) {
+function emailConfirmation_(l, s, facture) {
   var corps =
     'Bonjour ' + l.prenom + ',\n\n' +
     'Votre place à l\'' + CONFIG.TITRE + ' est confirmée. Je me réjouis de vous accueillir !\n\n' +
     infosPratiques_(s) + '\n\n' +
     'Le fichier joint ajoute la journée à votre agenda.\n\n' +
+    (facture ? 'Vous trouverez aussi la facture, à transmettre à votre caisse de chômage.\n\n' : '') +
     'À prévoir : votre abonnement Claude Pro actif (environ 20 CHF par mois). ' +
     'Le repas de midi, les boissons et les cafés sont offerts. Vous repartez avec une attestation de participation.\n\n' +
     'Je vous envoie les dernières informations pratiques quelques jours avant.\n\n' +
     'À bientôt,\nEve Schaller\nAgence Curcuma';
-  envoyer_(l.email, 'Votre place est confirmée — ' + CONFIG.TITRE + ' du ' + s.label, corps, [icsBlob_(s)]);
+  envoyer_(l.email, 'Votre place est confirmée — ' + CONFIG.TITRE + ' du ' + s.label, corps, facture ? [icsBlob_(s), facture] : [icsBlob_(s)]);
+}
+
+function emailPreinscription_(l, s) {
+  var corps =
+    'Bonjour ' + l.prenom + ',\n\n' +
+    'Merci pour votre pré-inscription à l\'' + CONFIG.TITRE + ' du ' + s.label + '.\n\n' +
+    'Comme votre participation passe par le chômage, votre inscription devient définitive une fois que l\'ORP a validé la formation. ' +
+    'D\'ici là, aucune place n\'est bloquée et aucun paiement ne vous est demandé.\n\n' +
+    'Dès que je reçois la validation de l\'ORP, je vous confirme votre place (s\'il en reste une), avec la facture à transmettre à votre caisse. ' +
+    'Si la date est complète, vous passez en liste d\'attente ou sur une date suivante.\n\n' +
+    'À bientôt,\nEve Schaller\nAgence Curcuma';
+  envoyer_(l.email, 'Votre pré-inscription — ' + CONFIG.TITRE + ' du ' + s.label, corps);
 }
 
 function emailListeAttente_(l, s) {
@@ -550,7 +601,9 @@ function resumeAdmin_(p, s, statut, actives, ligne) {
     p.prenom + ' ' + p.nom + ' <' + p.email + '>',
     p.rue + ', ' + p.npa + ' ' + p.localite,
     p.chomage === 'oui' ? 'VIA LE CHÔMAGE — caisse : ' + p.caisse + ' — ORP a déjà validé : ' + (p.validation || '?') +
-      '\n→ place gardée sans délai ; mets PRISE_EN_CHARGE à réception du courrier de l\'ORP.' : 'Paiement personnel (72 h)',
+      (p.validation === 'oui' ? '\n→ place gardée sans délai ; mets PRISE_EN_CHARGE à réception du courrier de l\'ORP.'
+        : '\n→ PRÉ-INSCRIPTION : aucune place bloquée. À réception de la validation de l\'ORP, mets PRISE_EN_CHARGE : la place est confirmée si elle est libre (facture jointe), sinon liste d\'attente.')
+      : 'Paiement personnel (72 h)',
     '',
     'Ce que la personne aimerait faire :', (p.attentes || '—'), '',
     'Places occupées : ' + actives + ' / ' + CONFIG.PLACES_MAX
@@ -582,11 +635,13 @@ function majAgenda_(sessionId) {
     var conf = lignes.filter(function (l) { return STATUTS_CONFIRMES.indexOf(l.statut) !== -1; });
     var res = lignes.filter(function (l) { return l.statut === ST.RESERVEE; });
     var att = fileAttente_(lignes, s.id);
+    var pre = lignes.filter(function (l) { return l.statut === ST.PREINSCR; });
     ev.setTitle(CONFIG.TITRE + ' — ' + conf.length + '/' + CONFIG.PLACES_MAX + ' confirmées' + (res.length ? ' (+' + res.length + ' en attente de paiement)' : ''));
     ev.setDescription(
       'Confirmées :\n' + (conf.map(function (l) { return '· ' + l.prenom + ' ' + l.nom + (l.statut === ST.PEC ? ' (prise en charge)' : ''); }).join('\n') || '—') +
       '\n\nRéservées, paiement attendu :\n' + (res.map(function (l) { return '· ' + l.prenom + ' ' + l.nom + (l.chomage ? ' (chômage, en attente de l\'ORP)' : ' (jusqu\'au ' + horodate_(l.reserveeJusqu) + ')'); }).join('\n') || '—') +
       '\n\nListe d\'attente :\n' + (att.map(function (l) { return '· ' + l.prenom + ' ' + l.nom; }).join('\n') || '—') +
+      '\n\nPré-inscriptions (ORP pas encore validé) :\n' + (pre.map(function (l) { return '· ' + l.prenom + ' ' + l.nom + ' — ' + l.caisse; }).join('\n') || '—') +
       '\n\nMis à jour automatiquement depuis la feuille d\'inscriptions.');
   } catch (err) {
     notifierAdmin_('⚠️ Agenda non mis à jour', String(err));
@@ -1071,7 +1126,7 @@ function initialiserFeuille() {
   larg.forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
   var n = Math.max(sh.getMaxRows() - 1, 300);
   sh.getRange(2, COL.STATUT, n, 1).setDataValidation(SpreadsheetApp.newDataValidation()
-    .requireValueInList([ST.RESERVEE, ST.PAYEE, ST.PEC, ST.ATTENTE, ST.ANNULEE], true).setAllowInvalid(false).build());
+    .requireValueInList([ST.RESERVEE, ST.PAYEE, ST.PEC, ST.ATTENTE, ST.PREINSCR, ST.ANNULEE], true).setAllowInvalid(false).build());
   sh.getRange(2, COL.SESSION, n, 1).setDataValidation(SpreadsheetApp.newDataValidation()
     .requireValueInList(CONFIG.SESSIONS.map(function (s) { return s.id; }), true).setAllowInvalid(false).build());
   /* Pas de cases à cocher pré-remplies : une case vide compte comme une
@@ -1087,7 +1142,7 @@ function initialiserFeuille() {
   };
   sh.setConditionalFormatRules([
     regle(ST.PAYEE, '#D6F5DC', '#0B5323'), regle(ST.PEC, '#D6F5DC', '#0B5323'),
-    regle(ST.RESERVEE, '#FDE6C9', '#7A3E00'), regle(ST.ATTENTE, '#E8EAED', '#3C4043'),
+    regle(ST.RESERVEE, '#FDE6C9', '#7A3E00'), regle(ST.ATTENTE, '#E8EAED', '#3C4043'), regle(ST.PREINSCR, '#DCE6F7', '#243A63'),
     regle(ST.ANNULEE, '#FAD2CF', '#7A0C0C')
   ]);
 }
