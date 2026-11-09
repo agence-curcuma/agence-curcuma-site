@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="fr-CH" class="no-js">
+<head>
+<script>document.documentElement.classList.remove('no-js');</script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Atelier Exploration IA en petit groupe à Courtételle | Curcuma</title>
+<meta name="description" content="Explorer l'IA en petit groupe (4 personnes max.) et mettre en place, en direct, un usage concret pour votre quotidien. Courtételle (JU), CHF 600.–, repas inclus." />
+<link rel="canonical" href="https://www.agence-curcuma.ch/atelier-exploration-ia.html" />
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+<meta name="author" content="Eve Schaller" />
+<meta name="theme-color" content="#14213d" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Agence Curcuma" />
+<meta property="og:locale" content="fr_CH" />
+<meta property="og:url" content="https://www.agence-curcuma.ch/atelier-exploration-ia.html" />
+<meta property="og:title" content="Atelier Exploration IA en petit groupe à Courtételle | Curcuma" />
+<meta property="og:description" content="Explorer l'IA en petit groupe (4 personnes max.) et mettre en place, en direct, un usage concret pour votre quotidien. Courtételle (JU), CHF 600.–, repas inclus." />
+<meta property="og:image" content="https://www.agence-curcuma.ch/curcuma-v2/images/og-curcuma.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="icon" href="/curcuma-v2/images/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/curcuma-v2/images/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&amp;family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500;1,9..144,600;0,9..144,600&amp;display=swap" />
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&amp;family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500;1,9..144,600;0,9..144,600&amp;display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================================
+   CURCUMA FORMATIONS — DA « Vague » (auto-contenue)
+   Même système que index.html + composants formation.
+   RÈGLE CONTRASTE : jamais blanc sur jaune, jamais jaune sur blanc.
+   ========================================================================== */
+:root{
+  --navy:#14213d; --navy-900:#0e1830; --navy-700:#243a63;
+  --yellow:#f2ff49; --white:#ffffff;
+  --cream:#f7f1e3; --cream-2:#efe7d3;
+  --ink:#14213d; --ink-soft:#4a5772;
+  --cream-on-navy:rgba(247,241,227,.82); --faint-on-navy:rgba(247,241,227,.58);
+  --font:'Barlow',system-ui,sans-serif; --serif:'Fraunces',Georgia,serif;
+  --r:30px; --r-sm:18px; --ease:cubic-bezier(.22,1,.36,1); --wrap:1180px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{font-family:var(--font);color:var(--ink);background:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+img{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+em,.it{font-family:var(--serif);font-style:italic;font-weight:500;}
+.wrap{width:100%;max-width:var(--wrap);margin-inline:auto;padding-inline:clamp(1.25rem,5vw,3rem);}
+section{position:relative;}
+.pad{padding-block:clamp(4rem,9vw,8rem);}
+.display{font-weight:800;line-height:.98;letter-spacing:-.02em;font-size:clamp(2.7rem,7vw,5.4rem);}
+.display em{font-weight:500;}
+h2{font-weight:800;line-height:1.02;letter-spacing:-.02em;font-size:clamp(2rem,4.6vw,3.4rem);}
+h2 em{font-weight:500;}
+.lead{font-size:clamp(1.12rem,1.8vw,1.45rem);line-height:1.5;max-width:52ch;}
+.kicker{display:inline-flex;align-items:center;gap:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.22em;font-size:.76rem;}
+.kicker::before{content:"";width:26px;height:2px;background:currentColor;}
+.hl{background:linear-gradient(var(--yellow),var(--yellow)) left 88%/100% .3em no-repeat;padding:0 .04em;}
+.on-navy .hl{background:none;text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:.14em;text-underline-offset:.1em;}
+.on-cream{background:var(--cream);} .on-cream-2{background:var(--cream-2);}
+.on-navy{background:var(--navy);color:var(--cream);}
+.on-navy h2,.on-navy .display{color:var(--white);} .on-navy .lead{color:var(--cream-on-navy);} .on-navy .kicker{color:var(--yellow);}
+
+.btn{display:inline-flex;align-items:center;gap:.6rem;padding:.95rem 1.7rem;border-radius:999px;font-weight:700;font-size:1rem;cursor:pointer;border:2px solid transparent;font-family:var(--font);transition:transform .25s var(--ease),box-shadow .25s var(--ease),background .25s var(--ease),color .25s var(--ease);}
+.btn--yellow{background:var(--yellow);color:var(--navy);}
+.btn--yellow:hover{transform:translateY(-2px) rotate(-1deg);box-shadow:0 14px 28px -12px rgba(20,33,61,.4);}
+.btn--navy{background:var(--navy);color:var(--cream);}
+.btn--navy:hover{transform:translateY(-2px) rotate(1deg);box-shadow:0 14px 28px -12px rgba(20,33,61,.5);}
+.btn--ghost{background:transparent;color:var(--navy);border-color:var(--navy);}
+.btn--ghost:hover{background:var(--navy);color:var(--cream);}
+.on-navy .btn--ghost{color:var(--cream);border-color:rgba(247,241,227,.5);}
+.on-navy .btn--ghost:hover{background:var(--yellow);color:var(--navy);border-color:var(--yellow);}
+.btn .arw{transition:transform .25s var(--ease);} .btn:hover .arw{transform:translateX(4px);}
+
+.hdr{position:fixed;inset:0 0 auto 0;z-index:50;padding-block:1rem;transition:background .4s var(--ease),padding .4s var(--ease);}
+.hdr.scrolled{background:rgba(14,24,48,.94);backdrop-filter:blur(10px);padding-block:.55rem;}
+.hdr-in{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;}
+.brand img{height:clamp(44px,5vw,60px);width:auto;transition:height .4s var(--ease);}
+.hdr.scrolled .brand img{height:46px;}
+.nav{display:flex;align-items:center;gap:1.8rem;}
+.nav a{color:var(--cream);font-weight:600;font-size:.98rem;}
+.nav a:hover{color:var(--yellow);}
+.hdr:not(.scrolled) .nav a:not(.btn){color:var(--navy);}
+.hdr:not(.scrolled) .burger span{background:var(--navy);}
+/* Menu ouvert : la croix de fermeture se trouve sur le panneau bleu marine,
+   elle doit donc rester crème, sinon elle est invisible. Ce sélecteur compte
+   4 classes contre 3 à la règle ci-dessus, il l'emporte. Même chose pour
+   l'anneau de focus au clavier, bleu marine par défaut. */
+.hdr.nav-open .burger span,
+.hdr.nav-open:not(.scrolled) .burger span{background:var(--cream);}
+.hdr.nav-open .burger:focus-visible{outline-color:var(--yellow);}
+/* le bouton jaune garde TOUJOURS son texte bleu foncé (priorité sur .nav a) */
+.nav a.btn--yellow{color:var(--navy);}
+.burger{display:none;flex-direction:column;gap:5px;background:none;border:0;cursor:pointer;width:44px;height:44px;justify-content:center;z-index:60;}
+.burger span{width:26px;height:2px;background:var(--cream);transition:.3s var(--ease);}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0;}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+.blob{position:absolute;border-radius:46% 54% 43% 57%/54% 46% 54% 46%;background:var(--yellow);z-index:0;}
+.wave-top,.wave-bottom{position:absolute;left:0;width:100%;line-height:0;z-index:1;}
+.wave-top{top:-1px;} .wave-bottom{bottom:-1px;}
+.wave-top svg,.wave-bottom svg{width:100%;height:clamp(40px,7vw,90px);display:block;}
+.curve{display:block;width:100%;max-width:560px;height:auto;overflow:visible;}
+.curve text{font-family:var(--serif);font-style:italic;font-weight:600;font-size:32px;}
+.curve--navy text{fill:var(--navy);} .curve--yellow text{fill:var(--yellow);}
+
+/* --- HERO formations ------------------------------------------------------ */
+.fhero{padding-top:clamp(7.5rem,14vh,10rem);padding-bottom:clamp(2.5rem,5vh,4rem);background:var(--cream);overflow:hidden;}
+.fhero .wrap{position:relative;z-index:2;}
+.fhero .display{margin:.4rem 0 1rem;max-width:16ch;}
+.fhero .lead{color:var(--ink-soft);}
+
+/* --- Onglets formations (pills, extensibles) ------------------------------ */
+.ftabs{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:2rem;}
+.ftab{font-family:var(--font);font-weight:700;font-size:.95rem;padding:.6rem 1.2rem;border-radius:999px;
+  border:2px solid var(--navy);background:transparent;color:var(--navy);cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;
+  transition:all .25s var(--ease);}
+.ftab:hover{transform:translateY(-2px);}
+.ftab[aria-selected="true"]{background:var(--navy);color:var(--cream);}
+.ftab .badge{font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:.14rem .5rem;border-radius:999px;background:var(--yellow);color:var(--navy);}
+.ftab.is-soon{opacity:.72;}
+
+/* --- Détail formation ----------------------------------------------------- */
+.fhead{display:grid;gap:1.2rem 2.5rem;grid-template-columns:1fr;align-items:end;margin-bottom:2.5rem;}
+.fmeta{display:flex;flex-wrap:wrap;gap:.7rem;}
+.chip{display:inline-flex;align-items:center;gap:.45rem;font-size:.9rem;font-weight:700;padding:.5rem 1rem;border-radius:999px;background:var(--cream-2);color:var(--navy);}
+.chip svg{width:16px;height:16px;}
+.fintro{display:grid;gap:1.4rem;grid-template-columns:1fr;}
+.fintro .obj{background:var(--navy);color:var(--cream);border-radius:var(--r);padding:clamp(1.5rem,3vw,2.2rem);}
+.fintro .obj .kicker{color:var(--yellow);margin-bottom:.8rem;}
+.fintro .obj p{color:var(--cream-on-navy);font-size:1.1rem;line-height:1.55;}
+.fintro .note{align-self:center;color:var(--ink-soft);}
+
+/* --- Accordéons jours ----------------------------------------------------- */
+.days{margin-top:2.5rem;display:grid;gap:1rem;}
+.day{border:2px solid var(--navy);border-radius:var(--r);overflow:hidden;background:var(--cream);transition:box-shadow .3s var(--ease);}
+.day.is-open{box-shadow:0 22px 46px -28px rgba(20,33,61,.4);}
+.day__t{width:100%;display:flex;align-items:center;gap:1.1rem;padding:clamp(1.2rem,3vw,1.7rem);background:none;border:0;text-align:left;cursor:pointer;font-family:var(--font);}
+.day__n{flex:none;font-family:var(--serif);font-style:italic;font-weight:600;font-size:1.15rem;color:var(--navy);background:var(--yellow);padding:.25rem .8rem;border-radius:999px;}
+.day__ti{flex:1;font-size:clamp(1.15rem,2.1vw,1.5rem);font-weight:800;color:var(--navy);line-height:1.15;}
+.day__ic{flex:none;width:26px;height:26px;position:relative;}
+.day__ic::before,.day__ic::after{content:"";position:absolute;top:50%;left:50%;width:14px;height:2px;background:var(--navy);transform:translate(-50%,-50%);transition:transform .3s var(--ease);}
+.day__ic::after{transform:translate(-50%,-50%) rotate(90deg);}
+.day.is-open .day__ic::after{transform:translate(-50%,-50%) rotate(0);}
+.day__p{overflow:hidden;max-height:0;transition:max-height .45s var(--ease);}
+/* Sans JavaScript (et pour les robots d'indexation qui n'exécutent pas les
+   scripts) : tout le programme reste déplié et lisible. */
+.no-js .day__p{max-height:none;}
+.no-js .day__ic{display:none;}
+.no-js .day__t{cursor:default;}
+.day__pin{padding:0 clamp(1.2rem,3vw,1.7rem) clamp(1.5rem,3vw,2rem);}
+.day__pin .dl{font-family:var(--serif);font-style:italic;font-weight:500;font-size:1.1rem;color:var(--ink);margin-bottom:1.2rem;}
+.mods{display:grid;gap:.7rem;}
+.mod{display:flex;gap:.8rem;align-items:flex-start;}
+.mod::before{content:"";flex:none;width:10px;height:10px;margin-top:.5rem;background:var(--navy);border-radius:50%;}
+.mod p{margin:0;} .mod strong{color:var(--navy);}
+
+/* --- Genèse (storytelling) ------------------------------------------------ */
+.story{display:grid;gap:2rem 3rem;grid-template-columns:1fr;align-items:start;}
+.story .body p{color:var(--ink-soft);margin-bottom:1rem;max-width:62ch;}
+.story .body p:last-child{margin-bottom:0;}
+.story .body strong{color:var(--navy);font-weight:700;}
+/* Voix des participants de l'édition précédente : la preuve, isolée du récit.
+   Citations verbatim — ne pas reformuler, c'est ce qui les rend crédibles. */
+.voices{background:var(--navy);color:var(--cream);border-radius:var(--r);padding:clamp(1.5rem,3vw,2rem);}
+/* Titre de l'encart : trop long pour le style « kicker » en capitales
+   espacées, on le traite en intertitre court sur fond navy. */
+.voices .vtitle{color:#fff;font-weight:800;font-size:1.05rem;line-height:1.3;
+  margin-bottom:1.4rem;padding-bottom:1.1rem;border-bottom:2px solid var(--yellow);}
+.voices figure{margin:0;padding-bottom:1.2rem;margin-bottom:1.2rem;border-bottom:1px solid var(--navy-700);}
+.voices figure:last-child{padding-bottom:0;margin-bottom:0;border-bottom:none;}
+.voices blockquote{margin:0;font-family:var(--serif);font-style:italic;font-weight:500;
+  color:var(--cream);font-size:1.05rem;line-height:1.45;}
+.voices blockquote::before{content:"« ";} .voices blockquote::after{content:" »";}
+@media(min-width:900px){.story{grid-template-columns:1.55fr .95fr;}}
+
+/* --- Formateur + certification -------------------------------------------- */
+.trust{display:grid;gap:1.6rem;grid-template-columns:1fr;align-items:stretch;}
+.tbox{background:var(--cream);border:2px solid var(--navy);border-radius:var(--r);padding:clamp(1.5rem,3vw,2.2rem);}
+.tbox h3{font-size:clamp(1.3rem,2.4vw,1.7rem);font-weight:800;color:var(--navy);line-height:1.15;margin-bottom:.9rem;}
+.tbox p{color:var(--ink-soft);margin-bottom:1rem;}
+.tbox p:last-child{margin-bottom:0;}
+.tbox .role{display:inline-block;font-family:var(--serif);font-style:italic;font-weight:500;
+  color:var(--navy);background:var(--yellow);padding:.25rem .8rem;border-radius:999px;font-size:.95rem;margin-bottom:1rem;}
+/* Lien vers la chaîne : traité comme un lien fort, pas comme un bouton, pour
+   ne pas concurrencer visuellement le bouton d'inscription. */
+.ytlink{display:inline-flex;align-items:center;gap:.55rem;font-weight:700;color:var(--navy);
+  text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:.12em;
+  text-decoration-color:var(--yellow);transition:color .25s var(--ease);}
+.ytlink svg{width:22px;height:22px;flex:none;}
+.ytlink:hover{color:var(--navy-700);}
+/* Carte certification : le logo partenaire reste sur fond clair neutre. */
+.tbox--crea{display:flex;flex-direction:column;text-align:center;align-items:center;justify-content:center;gap:.2rem;}
+.tbox--crea p{max-width:42ch;}
+/* flex:none — sans ça, l'image est un élément flexible en colonne et peut être
+   compressée à zéro selon la hauteur imposée par la carte voisine. */
+.tbox--crea img{flex:none;width:clamp(130px,20vw,170px);height:auto;margin-top:1.6rem;}
+@media(min-width:900px){.trust{grid-template-columns:1.4fr 1fr;}}
+
+/* --- Inscription ---------------------------------------------------------- */
+.enroll{background:var(--navy);color:var(--cream);border-radius:var(--r);padding:clamp(1.8rem,4vw,3rem);}
+.enroll__h{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;align-items:baseline;margin-bottom:1rem;}
+.enroll__h strong{color:#fff;font-size:1.15rem;}
+.enroll__seats{font-size:.92rem;color:var(--cream-on-navy);}
+/* Bandeau tarif dans l'encart d'inscription */
+.enroll__price{display:flex;flex-wrap:wrap;align-items:baseline;gap:.6rem 1rem;
+  border-top:1px solid var(--navy-700);border-bottom:1px solid var(--navy-700);
+  padding:1.1rem 0;margin-bottom:1.6rem;}
+.enroll__price .amt{font-size:clamp(1.7rem,4vw,2.2rem);font-weight:800;color:var(--yellow);line-height:1;}
+.enroll__price .per{color:var(--cream-on-navy);font-size:.95rem;}
+.enroll__price .inc{flex-basis:100%;color:var(--cream-on-navy);font-size:.92rem;}
+.enroll__price .inc b{color:#fff;font-weight:700;}
+.fg{display:grid;gap:1.1rem;grid-template-columns:1fr;}
+.fld{display:flex;flex-direction:column;gap:.4rem;} .fld--full{grid-column:1/-1;}
+.fld label{font-size:.9rem;font-weight:700;color:#fff;}
+.fld input,.fld textarea{font-family:var(--font);font-size:1rem;padding:.85rem 1rem;border-radius:var(--r-sm);border:2px solid var(--navy-700);background:var(--navy-900);color:var(--cream);transition:border-color .25s var(--ease),box-shadow .25s var(--ease);}
+.fld input::placeholder,.fld textarea::placeholder{color:rgba(247,241,227,.4);}
+.fld input:focus,.fld textarea:focus{outline:none;border-color:var(--yellow);box-shadow:0 0 0 3px rgba(242,255,73,.18);}
+.enroll__a{margin-top:1.5rem;display:flex;flex-wrap:wrap;align-items:center;gap:1rem;}
+.enroll__note{font-size:.8rem;color:var(--faint-on-navy);max-width:46ch;}
+
+/* Case de consentement newsletter (distincte de l'inscription) */
+.consent{display:flex;gap:.7rem;align-items:flex-start;margin-top:1.2rem;cursor:pointer;
+  font-size:.9rem;color:var(--cream-on-navy);line-height:1.5;max-width:60ch;}
+.consent input{appearance:none;flex:0 0 auto;width:20px;height:20px;margin-top:.1rem;cursor:pointer;
+  border:2px solid rgba(247,241,227,.45);border-radius:6px;background:transparent;transition:.2s var(--ease);}
+.consent input:checked{background:var(--yellow);border-color:var(--yellow);}
+.consent input:checked::after{content:"";display:block;width:6px;height:11px;margin:1px auto 0;
+  border:solid var(--navy);border-width:0 2.5px 2.5px 0;transform:rotate(45deg);}
+.consent:hover input{border-color:var(--yellow);}
+.consent a{color:var(--yellow);text-decoration:underline;text-underline-offset:.15em;}
+/* Case CG : obligatoire, donc légèrement plus présente que la case newsletter. */
+.consent--req{color:var(--cream);}
+.consent--req input{border-color:rgba(242,255,73,.6);}
+
+/* Piège à robots — masqué visuellement sans être « display:none »,
+   que certains spambots savent détecter. */
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;}
+
+/* État d'envoi + confirmation */
+.btn[aria-busy="true"]{opacity:.6;pointer-events:none;}
+.eok{text-align:center;}
+.eok .bf{display:inline-block;background:var(--yellow);color:var(--navy);font-weight:800;
+  font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:.35rem .9rem;
+  border-radius:999px;margin-bottom:1.2rem;}
+.eok h3{color:#fff;font-size:clamp(1.4rem,3vw,2rem);font-weight:800;margin-bottom:.8rem;}
+.eok p{color:var(--cream-on-navy);max-width:48ch;margin-inline:auto;}
+.eok .next{margin-top:1.6rem;text-align:left;display:grid;gap:.7rem;max-width:34rem;
+  margin-inline:auto;padding-top:1.4rem;border-top:1px solid var(--navy-700);}
+.eok .next li{display:flex;gap:.8rem;align-items:flex-start;color:var(--cream-on-navy);font-size:.95rem;}
+.eok .next b{flex:0 0 auto;width:24px;height:24px;border-radius:999px;background:var(--yellow);
+  color:var(--navy);font-size:.8rem;font-weight:800;display:grid;place-items:center;}
+.fmsg{margin-top:1rem;font-weight:700;} .fmsg.ok{color:var(--yellow);} .fmsg.err{color:#ff8f8f;}
+.efull{text-align:center;padding:clamp(2rem,5vw,3.5rem) 1rem;}
+.efull .bf{display:inline-block;font-weight:800;letter-spacing:.02em;background:var(--yellow);color:var(--navy);padding:.4rem 1rem;border-radius:999px;margin-bottom:1rem;font-size:.85rem;text-transform:uppercase;}
+.efull h3{font-size:clamp(1.6rem,3vw,2.2rem);color:#fff;margin-bottom:.8rem;}
+
+/* Inscriptions fermées + encart « prochaine édition » */
+.eclosed .bf{display:inline-block;font-weight:800;letter-spacing:.06em;background:transparent;color:var(--cream);
+  border:1.5px solid var(--cream-on-navy);padding:.35rem .9rem;border-radius:999px;font-size:.75rem;text-transform:uppercase;}
+.eclosed__txt{color:var(--cream-on-navy);margin:1rem 0 1.8rem;max-width:56ch;}
+.nexted{border:2px solid var(--yellow);border-radius:var(--r-sm);padding:clamp(1.3rem,3.5vw,2.2rem);background:var(--navy-900);}
+.nexted .kicker{color:var(--yellow);margin-bottom:.3rem;}
+.nexted h3{color:#fff;font-size:clamp(1.5rem,3.2vw,2.1rem);font-weight:800;margin-bottom:.6rem;}
+.nexted h3 em{font-family:var(--serif);font-style:italic;font-weight:500;color:var(--yellow);}
+.nexted > p{color:var(--cream-on-navy);max-width:56ch;margin-bottom:1.4rem;}
+.nexted .eok{padding-top:.4rem;}
+.nexted .fg > *{min-width:0;} .nexted .fld input{width:100%;min-width:0;box-sizing:border-box;}
+@media(max-width:520px){.nexted{padding:1.2rem 1rem;}}
+
+/* --- Bridge / footer ------------------------------------------------------ */
+.bridge{display:grid;gap:1.4rem;align-items:center;background:var(--navy);color:var(--cream);border-radius:var(--r);padding:clamp(2rem,5vw,3.2rem);position:relative;overflow:hidden;}
+.bridge h2{color:#fff;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.1;margin-bottom:.6rem;} .bridge p{color:var(--cream-on-navy);}
+.ftr{background:var(--navy-900);color:var(--cream-on-navy);padding-block:clamp(3rem,6vw,5rem) 2rem;}
+.ftr img{height:54px;width:auto;margin-bottom:1rem;}
+.ftr-bot{border-top:1px solid var(--navy-700);padding-top:1.4rem;display:flex;flex-wrap:wrap;gap:.4rem 1.4rem;justify-content:space-between;font-size:.85rem;color:var(--faint-on-navy);}
+.ftr-bot a:hover{color:var(--yellow);}
+
+[data-a]{opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease);}
+[data-a].vis{opacity:1;transform:none;}
+[data-d="1"]{transition-delay:.08s;}[data-d="2"]{transition-delay:.16s;}[data-d="3"]{transition-delay:.24s;}
+
+@media(min-width:820px){
+  .fhead{grid-template-columns:1.6fr 1fr;}
+  .fintro{grid-template-columns:1.4fr 1fr;}
+  .fg{grid-template-columns:1fr 1fr;}
+  .bridge{grid-template-columns:1.5fr auto;}
+}
+@media(max-width:819px){
+  /* ------------------------------------------------------------------------
+     CORRECTIF DU MENU MOBILE — ne pas remettre de « backdrop-filter » ici.
+     Un filtre non nul fait du header le BLOC CONTENEUR de ses descendants en
+     position:fixed. Dès que le défilement ajoutait la classe « scrolled », le
+     menu plein écran se retrouvait donc enfermé dans la hauteur du header :
+     fond bleu réduit à la bande du haut et liens débordant sur la page.
+     ------------------------------------------------------------------------ */
+  .hdr.scrolled{backdrop-filter:none;background:var(--navy-900);}
+  .hdr.nav-open,.hdr.nav-open.scrolled{background:transparent;}
+  .nav{position:fixed;inset:0;z-index:55;flex-direction:column;justify-content:center;gap:1.6rem;
+    background:var(--navy-900);transform:translateX(100%);transition:transform .4s var(--ease);
+    padding:6rem 2rem 3rem;overflow-y:auto;}
+  .nav.open{transform:translateX(0);}
+  .nav a{font-size:1.4rem;}
+  /* La règle « .hdr:not(.scrolled) .nav a:not(.btn) » (4 classes) colore les
+     liens en bleu marine tant que la page n'est pas défilée. Sur le panneau
+     bleu marine du menu ils devenaient illisibles. Ce sélecteur en compte 5,
+     il l'emporte donc sans ambiguïté. */
+  .hdr.nav-open .nav a:not(.btn),
+  .hdr.nav-open:not(.scrolled) .nav a:not(.btn){color:var(--cream);}
+  .burger{display:flex;}
+  .brand{position:relative;z-index:56;}
+  /* Verrou de défilement : html ET body — l'élément qui défile est html. */
+  html.nav-lock,body.nav-lock{overflow:hidden;}
+  body.nav-lock .totop{opacity:0;visibility:hidden;}
+}
+.totop{position:fixed;right:clamp(1rem,3vw,2rem);bottom:clamp(1rem,3vw,2rem);z-index:70;width:48px;height:48px;border-radius:999px;border:0;cursor:pointer;background:var(--navy);color:var(--yellow);display:grid;place-items:center;opacity:0;visibility:hidden;transform:translateY(12px);transition:opacity .3s var(--ease),transform .3s var(--ease),visibility .3s;box-shadow:0 10px 24px -10px rgba(20,33,61,.5);}.totop.show{opacity:1;visibility:visible;transform:none;}.totop:hover{background:var(--yellow);color:var(--navy);}.totop svg{width:22px;height:22px;} :focus-visible{outline:3px solid var(--navy);outline-offset:2px;}
+.on-navy :focus-visible,.enroll :focus-visible{outline-color:var(--yellow);}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}*{animation-duration:.001ms!important;transition-duration:.001ms!important;}[data-a]{opacity:1!important;transform:none!important;}}
+
+/* --- Journée IA : choix de la date ---------------------------------------- */
+.fhead{display:grid;gap:1.6rem;margin-bottom:2.2rem;align-items:end;}
+.fhero .kicker a:hover{text-decoration:underline;}
+.dates{border:0;margin:0 0 1.6rem;padding:0;display:grid;gap:.8rem;grid-template-columns:1fr;}
+.dates__lg{font-weight:800;color:#fff;font-size:1.05rem;margin-bottom:.9rem;padding:0;}
+.dates__lg span{font-weight:500;color:var(--faint-on-navy);font-size:.9rem;}
+.dcard{position:relative;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:1rem;align-items:center;
+  border:2px solid var(--navy-700);border-radius:var(--r-sm);padding:1rem 1.1rem;cursor:pointer;background:var(--navy-900);
+  transition:border-color .25s var(--ease),background .25s var(--ease),transform .25s var(--ease);}
+.dcard input{position:absolute;opacity:0;pointer-events:none;}
+.dcard__day{grid-row:1/3;display:grid;place-items:center;width:3.6rem;height:3.6rem;border-radius:14px;background:var(--navy-700);color:var(--cream);line-height:1;}
+.dcard__day b{font-size:1.5rem;font-weight:800;}
+.dcard__day small{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-top:-.6rem;}
+.dcard__t{color:#fff;font-weight:700;font-size:1.02rem;}
+.dcard__s{font-size:.85rem;color:var(--cream-on-navy);min-height:1.3em;}
+.dcard:hover{border-color:rgba(242,255,73,.6);}
+.dcard:has(input:checked){border-color:var(--yellow);background:var(--navy-700);}
+.dcard:has(input:checked) .dcard__day{background:var(--yellow);color:var(--navy);}
+.dcard:has(input:focus-visible){outline:2px solid var(--yellow);outline-offset:3px;}
+.dcard.is-few .dcard__s{color:var(--yellow);font-weight:700;}
+.dcard.is-wait .dcard__s{color:var(--cream);font-weight:700;}
+.dcard.is-closed{opacity:.45;cursor:not-allowed;}
+.dcard.is-closed:hover{border-color:var(--navy-700);}
+@media(min-width:720px){.dates{grid-template-columns:repeat(3,1fr);} .dcard{grid-template-columns:1fr;grid-template-rows:auto;row-gap:.35rem;text-align:left;}
+  .dcard__day{grid-row:auto;margin-bottom:.4rem;}}
+.plist{display:grid;gap:.9rem;margin:0;padding:0;list-style:none;}
+.plist li{position:relative;padding-left:1.5rem;color:var(--ink-soft);}
+.plist li::before{content:"";position:absolute;left:0;top:.5rem;width:10px;height:10px;background:var(--yellow);border:2px solid var(--navy);border-radius:50%;}
+.plist b{color:var(--navy);}
+.tbox em{color:var(--navy);}
+.eok strong{color:#fff;}
+.cmp{display:grid;gap:1.2rem;grid-template-columns:1fr;}
+.cmp__c{border:2px solid var(--navy);border-radius:var(--r);padding:clamp(1.4rem,3vw,2rem);background:var(--cream);}
+.cmp__c h3{font-size:clamp(1.2rem,2.2vw,1.5rem);font-weight:800;color:var(--navy);margin-bottom:1rem;}
+.cmp__c ul{list-style:none;margin:0 0 1rem;padding:0;display:grid;gap:.6rem;}
+.cmp__c li{position:relative;padding-left:1.3rem;color:var(--ink-soft);}
+.cmp__c li::before{content:"";position:absolute;left:0;top:.6rem;width:8px;height:8px;border-radius:50%;background:var(--navy);}
+.cmp__c li b{color:var(--navy);}
+.cmp__c--on{background:var(--navy);border-color:var(--navy);}
+.cmp__c--on h3{color:#fff;} .cmp__c--on li{color:var(--cream-on-navy);} .cmp__c--on li b{color:#fff;}
+.cmp__c--on li::before{background:var(--yellow);}
+.cmp__b{display:inline-block;background:var(--yellow);color:var(--navy);font-weight:800;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;padding:.25rem .7rem;border-radius:999px;margin-bottom:.8rem;}
+@media(min-width:820px){.cmp{grid-template-columns:1.15fr 1fr;}}
+.chom{grid-column:1/-1;display:grid;gap:1rem;border:1px solid var(--navy-700);border-radius:var(--r-sm);padding:1rem 1.1rem;}
+.chom .consent{margin-top:0;}
+.chom__q{display:none;gap:1rem;} .chom.is-on .chom__q{display:grid;}
+.radios{display:flex;flex-wrap:wrap;gap:.6rem 1.4rem;}
+.radios label{display:flex;align-items:center;gap:.5rem;color:var(--cream);font-size:.95rem;cursor:pointer;}
+.radios input{accent-color:var(--yellow);width:18px;height:18px;}
+.chom__n{font-size:.88rem;color:var(--cream-on-navy);margin-top:.7rem;max-width:52ch;} .chom__n b{color:var(--yellow);}
+.radios__t{font-size:.9rem;font-weight:700;color:#fff;margin-bottom:.4rem;}
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Course",
+      "@id": "https://www.agence-curcuma.ch/atelier-exploration-ia.html#atelier-exploration-ia",
+      "name": "Atelier Exploration IA",
+      "description": "Une journée à Courtételle, 4 personnes au maximum : le matin, exploration de ce que l'IA sait faire (écrire, mettre en page, s'organiser, sécurité) ; l'après-midi, un usage personnel mis en place en direct. Sans connaissance technique.",
+      "url": "https://www.agence-curcuma.ch/atelier-exploration-ia.html",
+      "inLanguage": "fr-CH",
+      "educationalLevel": "Débutant",
+      "provider": { "@type": "Organization", "@id": "https://www.agence-curcuma.ch/#organisation", "name": "Agence Curcuma", "url": "https://www.agence-curcuma.ch/" },
+      "offers": { "@type": "Offer", "category": "Paid", "price": "600", "priceCurrency": "CHF", "url": "https://www.agence-curcuma.ch/atelier-exploration-ia.html#dates" },
+      "hasCourseInstance": [
+        { "@type": "CourseInstance", "courseMode": "onsite", "courseWorkload": "PT8H", "maximumAttendeeCapacity": 4, "startDate": "2026-12-10T08:30:00+01:00", "endDate": "2026-12-10T17:00:00+01:00",
+          "location": { "@type": "Place", "name": "Agence Curcuma", "address": { "@type": "PostalAddress", "streetAddress": "Au Bévan 11b", "postalCode": "2852", "addressLocality": "Courtételle", "addressRegion": "Jura", "addressCountry": "CH" } },
+          "instructor": { "@type": "Person", "@id": "https://www.agence-curcuma.ch/#eve-schaller", "name": "Eve Schaller" } },
+        { "@type": "CourseInstance", "courseMode": "onsite", "courseWorkload": "PT8H", "maximumAttendeeCapacity": 4, "startDate": "2027-01-14T08:30:00+01:00", "endDate": "2027-01-14T17:00:00+01:00",
+          "location": { "@type": "Place", "name": "Agence Curcuma", "address": { "@type": "PostalAddress", "streetAddress": "Au Bévan 11b", "postalCode": "2852", "addressLocality": "Courtételle", "addressRegion": "Jura", "addressCountry": "CH" } },
+          "instructor": { "@type": "Person", "@id": "https://www.agence-curcuma.ch/#eve-schaller", "name": "Eve Schaller" } },
+        { "@type": "CourseInstance", "courseMode": "onsite", "courseWorkload": "PT8H", "maximumAttendeeCapacity": 4, "startDate": "2027-02-11T08:30:00+01:00", "endDate": "2027-02-11T17:00:00+01:00",
+          "location": { "@type": "Place", "name": "Agence Curcuma", "address": { "@type": "PostalAddress", "streetAddress": "Au Bévan 11b", "postalCode": "2852", "addressLocality": "Courtételle", "addressRegion": "Jura", "addressCountry": "CH" } },
+          "instructor": { "@type": "Person", "@id": "https://www.agence-curcuma.ch/#eve-schaller", "name": "Eve Schaller" } }]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.agence-curcuma.ch/" },
+        { "@type": "ListItem", "position": 2, "name": "Formations", "item": "https://www.agence-curcuma.ch/formations.html" },
+        { "@type": "ListItem", "position": 3, "name": "Atelier Exploration IA", "item": "https://www.agence-curcuma.ch/atelier-exploration-ia.html" }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<header class="hdr" id="hdr">
+  <div class="wrap hdr-in">
+    <a class="brand" href="index.html" aria-label="Agence Curcuma"><img src="curcuma-v2/images/logo-curcuma-navy.png" alt="Agence Curcuma — agence marketing" id="brand-logo" width="500" height="150" fetchpriority="high" /></a>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="nav" aria-label="Menu"><span></span><span></span><span></span></button>
+    <nav class="nav" id="nav">
+      <a href="index.html#methode">La méthode</a>
+      <a href="index.html#fondatrice">Qui suis-je</a>
+      <a href="formations.html" aria-current="page">Formations</a>
+      <a class="btn btn--yellow" href="#dates">Choisir ma date</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- ============================ HERO ============================ -->
+<section class="fhero">
+  <span class="blob" style="width:300px;height:300px;top:-70px;right:-70px;opacity:.85;" aria-hidden="true"></span>
+  <span class="blob" style="width:150px;height:150px;bottom:-30px;left:38%;opacity:.45;" aria-hidden="true"></span>
+  <div class="wrap">
+    <p class="kicker" style="color:var(--navy);" data-a><a href="formations.html" style="color:inherit;">Curcuma Formations</a> · Atelier Exploration IA</p>
+    <h1 class="display" data-a data-d="1">Explorer l'IA, puis la mettre en place pour <span class="hl">vous</span>.</h1>
+    <p class="lead" data-a data-d="2">Une journée en petit groupe, une fois par mois en présentiel. Le matin, des démonstrations de cas d'usage pour la productivité, la bureautique et la communication. L'après-midi, la pratique : on met en place, en direct, un usage concret pour <em>votre</em> quotidien.</p>
+    <p data-a data-d="3" style="margin-top:2rem;"><a class="btn btn--navy" href="#dates">Choisir ma date <span class="arw" aria-hidden="true">→</span></a></p>
+  </div>
+</section>
+
+<!-- ============================ DÉTAIL ============================ -->
+<section class="pad on-cream-2" id="detail" aria-label="Détail de la journée">
+  <div class="wave-top" aria-hidden="true"><svg viewBox="0 0 1200 90" preserveAspectRatio="none"><path d="M0,50 C300,90 600,10 900,50 C1050,70 1150,45 1200,55 L1200,0 L0,0 Z" fill="#f7f1e3"/></svg></div>
+  <div class="wrap" style="position:relative;z-index:2;">
+    <div class="fhead">
+      <div data-a>
+        <p class="kicker" style="color:var(--navy);">Une fois par mois en présentiel · 4 personnes</p>
+        <h2>Un atelier d'exploration, un usage mis en place en direct</h2>
+      </div>
+      <div class="fmeta" data-a data-d="1">
+        <span class="chip"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>1 journée · 8h30–17h00</span></span>
+        <span class="chip"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg><span>4 personnes au maximum</span></span>
+        <span class="chip"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 12 22l-9-9V3h10l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg><span>CHF 600.–</span></span>
+        <span class="chip"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v7a3 3 0 0 0 6 0V3M7 10v11"/><path d="M18 3c-1.7 1.4-2.5 3.4-2.5 6 0 1.7.8 2.8 2.5 3v9"/></svg><span>Repas de midi et boissons inclus</span></span>
+        <span class="chip"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Aucune connaissance technique</span></span>
+        <span class="chip"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Au Bévan 11b · Courtételle</span></span>
+      </div>
+    </div>
+
+    <div class="fintro">
+      <div class="obj" data-a>
+        <p class="kicker">À la fin de la journée</p>
+        <p>Vous avez découvert plusieurs usages concrets de l'IA, vous savez l'utiliser en sécurité, et un usage simple, taillé pour votre quotidien, fonctionne déjà sur votre ordinateur.</p>
+      </div>
+      <p class="note" data-a data-d="1">Quatre personnes au maximum : chacun·e avance sur ses propres besoins, avec du temps pour ses questions. Accessible si vous n'avez jamais utilisé l'IA. Une <em>attestation de participation</em> vous est remise en fin de journée.</p>
+    </div>
+
+    <div class="days" id="days" role="list" aria-label="Programme de la journée">
+      <div class="day is-open" role="listitem">
+        <h3 style="margin:0;"><button class="day__t" aria-expanded="true" aria-controls="jia-0"><span class="day__n">Matin · démos</span><span class="day__ti">Explorer ce que l'IA peut faire</span><span class="day__ic" aria-hidden="true"></span></button></h3>
+        <div class="day__p" id="jia-0" role="region"><div class="day__pin">
+          <p class="dl">Des démonstrations en direct, sur des cas concrets.</p>
+          <div class="mods">
+            <div class="mod"><p><strong>Ce que l'IA sait faire, et ce qu'elle ne sait pas — </strong>pour savoir quand lui faire confiance et quand vérifier.</p></div>
+            <div class="mod"><p><strong>Bien formuler sa demande — </strong>la méthode pour obtenir une réponse utile du premier coup, ou presque.</p></div>
+            <div class="mod"><p><strong>Écrire et communiquer — </strong>rédiger, reformuler, résumer : e-mails, courriers, documents.</p></div>
+            <div class="mod"><p><strong>Mettre en page — </strong>des documents et des visuels simples et professionnels, sans logiciel de graphisme.</p></div>
+            <div class="mod"><p><strong>S'organiser — </strong>planifier sa semaine, suivre ses démarches, préparer un rendez-vous important.</p></div>
+            <div class="mod"><p><strong>Sécurité — </strong>ce qu'on peut confier à l'IA, ce qu'on garde pour soi, et comment vérifier ses réponses.</p></div>
+          </div>
+        </div></div>
+      </div>
+      <div class="day" role="listitem">
+        <h3 style="margin:0;"><button class="day__t" aria-expanded="false" aria-controls="jia-1"><span class="day__n">Après-midi · pratique</span><span class="day__ti">L'IA à votre service, adaptée à vos besoins</span><span class="day__ic" aria-hidden="true"></span></button></h3>
+        <div class="day__p" id="jia-1" role="region"><div class="day__pin">
+          <p class="dl">À vous de jouer : chacun·e choisit une tâche de son quotidien, et on la met en place ensemble.</p>
+          <div class="mods">
+            <div class="mod"><p><strong>Choisir sa tâche — </strong>ce qui vous prend du temps ou de l'énergie chaque semaine, par exemple : organisation personnelle, mise en page et production de documents, aide à la réflexion…</p></div>
+            <div class="mod"><p><strong>Mettre en place, en direct — </strong>on construit votre usage pas à pas, avec moi à vos côtés, on l'essaie sur vos vrais documents, on l'ajuste.</p></div>
+            <div class="mod"><p><strong>Repartir équipé·e — </strong>votre usage prêt à servir dès le lendemain, et une attestation de participation pour votre dossier.</p></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ PRATIQUE + ANIMATRICE ============================ -->
+<section class="pad on-cream-2" aria-label="Infos pratiques" style="padding-top:0;">
+  <div class="wrap">
+    <div class="trust">
+      <div class="tbox" data-a>
+        <p class="kicker" style="color:var(--navy);margin-bottom:.8rem;">Bon à savoir</p>
+        <h3>Ce qu'il faut prévoir</h3>
+        <ul class="plist">
+          <li><b>Votre ordinateur portable</b> et son chargeur.</li>
+          <li><b>Un abonnement Claude Pro</b> (environ 20 CHF par mois), actif le jour J. C'est l'outil que nous utilisons toute la journée.</li>
+          <li><b>Le lieu :</b> Au Bévan 11b, 2852 Courtételle. Places de parc visiteurs, parc à vélos, arrêt de bus à proximité (Courtételle, Courtemelon). Le repas de midi, les boissons et les cafés sont offerts.</li>
+          <li><b>Le groupe :</b> de 2 à 4 personnes. Si moins de 2 personnes sont inscrites, la journée est reportée ou intégralement remboursée, à votre choix.</li>
+          <li><b>Le paiement :</b> la facture arrive par e-mail avec un bulletin QR. Votre place est réservée 72 heures, puis confirmée à réception du paiement.</li>
+        </ul>
+      </div>
+      <div class="tbox" data-a data-d="1">
+        <p class="kicker" style="color:var(--navy);margin-bottom:.8rem;">Qui anime</p>
+        <h3>Eve Schaller</h3>
+        <span class="role">Fondatrice de l'Agence Curcuma</span>
+        <p>J'utilise l'IA tous les jours pour organiser mes semaines, créer et mettre en page mes documents, et m'assister dans mon travail avec des entreprises et des institutions du Jura.</p>
+        <p>Pendant l'atelier, je partage avec vous mes usages personnels et professionnels, et mes astuces pour l'organisation, la bureautique et la communication.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ DIFFÉRENCE AVEC LA FORMATION 3 JOURS ============================ -->
+<section class="pad on-cream" aria-label="Quelle formation choisir" style="padding-bottom:0;">
+  <div class="wrap">
+    <div style="margin-bottom:1.8rem;" data-a>
+      <p class="kicker" style="color:var(--navy);">Laquelle choisir ?</p>
+      <h2>Atelier Exploration ou formation <em>certifiante</em>&nbsp;?</h2>
+    </div>
+    <div class="cmp" data-a data-d="1">
+      <div class="cmp__c cmp__c--on">
+        <span class="cmp__b">Cette page</span>
+        <h3>Atelier Exploration IA</h3>
+        <ul>
+          <li><b>Pour explorer et tester</b> l'IA, à titre personnel ou pour votre entreprise, même si vous ne l'avez jamais utilisée</li>
+          <li><b>1 journée</b>, 4 personnes au maximum, une fois par mois en présentiel à Courtételle</li>
+          <li><b>Des cas d'usage pratiques</b> pour la productivité, la bureautique et la communication, partagés par Eve</li>
+          <li><b>Un usage simple, réalisable en un après-midi</b>, mis en place en direct sur vos propres tâches</li>
+          <li>Pour découvrir et essayer, pas pour développer des compétences avancées en IA générative</li>
+          <li>CHF 600.–</li>
+        </ul>
+      </div>
+      <div class="cmp__c">
+        <h3>Formation IA générative</h3>
+        <ul>
+          <li><b>Certifiée CREA</b></li>
+          <li><b>Pour les professionnel·le·s</b> qui veulent créer des visuels et des processus de travail avec l'IA</li>
+          <li><b>2 à 3 jours</b>, jusqu'à 20 personnes, à Delémont</li>
+          <li>Donnée par un expert et conférencier IA</li>
+          <li>Une formation complète sur l'IA générative : texte, image, vidéo, agents, automatisation</li>
+          <li>Prochaine édition au printemps 2027</li>
+        </ul>
+        <p><a class="ytlink" href="formations.html">Voir la formation certifiante</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ INSCRIPTION ============================ -->
+<section class="pad on-cream" id="dates">
+  <div class="wrap" style="max-width:920px;">
+    <div style="margin-bottom:2rem;" data-a>
+      <p class="kicker" style="color:var(--navy);">Inscriptions</p>
+      <h2>Choisir votre <em>date</em></h2>
+      <p class="lead" style="margin-top:1rem;color:var(--ink-soft);">Une journée par mois, quatre places à chaque fois.</p>
+    </div>
+
+    <div id="enroll-zone" data-a data-d="1">
+      <div class="enroll">
+        <form id="jia-form" novalidate method="post" action="#">
+          <fieldset class="dates" id="date-list">
+            <legend class="dates__lg">1. La date</legend>
+            <!-- Pré-rendu : le script ajoute l'état des places. -->
+            <label class="dcard"><input type="radio" name="session" value="JIA-2026-12-10" checked /><span class="dcard__day" aria-hidden="true"><b>10</b><small>déc.</small></span><span class="dcard__t">Jeudi 10 décembre 2026</span><span class="dcard__s"></span></label>
+            <label class="dcard"><input type="radio" name="session" value="JIA-2027-01-14" /><span class="dcard__day" aria-hidden="true"><b>14</b><small>janv.</small></span><span class="dcard__t">Jeudi 14 janvier 2027</span><span class="dcard__s"></span></label>
+            <label class="dcard"><input type="radio" name="session" value="JIA-2027-02-11" /><span class="dcard__day" aria-hidden="true"><b>11</b><small>févr.</small></span><span class="dcard__t">Jeudi 11 février 2027</span><span class="dcard__s"></span></label>
+          </fieldset>
+
+          <p class="enroll__price">
+            <span class="amt">CHF 600.–</span>
+            <span class="per">par personne, pour la journée</span>
+            <span class="inc"><b>Inclus :</b> le repas de midi, les boissons, les cafés et l'attestation de participation.</span>
+          </p>
+
+          <p class="dates__lg">2. Vos coordonnées <span>(elles figurent sur la facture)</span></p>
+          <div class="fg">
+            <div class="fld"><label for="prenom">Prénom</label><input id="prenom" name="prenom" type="text" autocomplete="given-name" required placeholder="Camille" /></div>
+            <div class="fld"><label for="nom">Nom</label><input id="nom" name="nom" type="text" autocomplete="family-name" required placeholder="Rossier" /></div>
+            <div class="fld fld--full"><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="email" required placeholder="camille@exemple.ch" /></div>
+            <div class="fld fld--full"><label for="rue">Rue et n°</label><input id="rue" name="rue" type="text" autocomplete="street-address" required placeholder="Rue du Moulin 12" /></div>
+            <div class="fld"><label for="npa">NPA</label><input id="npa" name="npa" type="text" inputmode="numeric" autocomplete="postal-code" required placeholder="2800" /></div>
+            <div class="fld"><label for="localite">Localité</label><input id="localite" name="localite" type="text" autocomplete="address-level2" required placeholder="Delémont" /></div>
+            <div class="fld fld--full"><label for="attentes">Ce que vous aimeriez pouvoir faire avec l'IA (facultatif)</label><textarea id="attentes" name="attentes" rows="3" placeholder="Une tâche qui vous prend du temps, une idée, une question…"></textarea></div>
+            <div class="chom" id="chom">
+              <label class="consent" for="chomage">
+                <input type="checkbox" id="chomage" name="chomage" value="oui" />
+                <span>Mon inscription passe par le chômage (ORP / caisse de chômage)</span>
+              </label>
+              <div class="chom__q">
+                <div class="fld"><label for="caisse">Votre caisse de chômage</label><input id="caisse" name="caisse" type="text" placeholder="Nom de la caisse" /></div>
+                <div>
+                  <p class="radios__t">L'ORP a-t-il déjà validé cette formation ?</p>
+                  <div class="radios">
+                    <label><input type="radio" name="validation_orp" value="oui" /> Oui</label>
+                    <label><input type="radio" name="validation_orp" value="pas encore" /> Pas encore</label>
+                  </div>
+                  <p class="chom__n" id="chom-n" hidden>Pas de souci : vous êtes <b>pré-inscrit·e</b>, sans place bloquée ni paiement. Votre place est confirmée dès que l'ORP a validé la formation, s'il en reste une.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <label class="consent consent--req" for="cgv">
+            <input type="checkbox" id="cgv" name="consentement" value="oui" required />
+            <span>J'ai lu et j'accepte les <a href="conditions-atelier-exploration-ia.html" target="_blank" rel="noopener">conditions de l'Atelier Exploration IA</a>. En résumé : ma place est réservée 72 heures et confirmée à réception du paiement ; sans paiement dans ce délai, elle peut être proposée à la personne suivante.</span>
+          </label>
+          <label class="consent" for="newsletter">
+            <input type="checkbox" id="newsletter" name="newsletter" value="oui" />
+            <span>Je souhaite aussi recevoir les prochaines dates de formation de l'Agence Curcuma. (facultatif, désinscription en un clic)</span>
+          </label>
+
+          <div class="hp" aria-hidden="true"><label for="site-web">Ne pas remplir</label><input type="text" id="site-web" name="site_web" tabindex="-1" autocomplete="off" /></div>
+
+          <div class="enroll__a">
+            <button type="submit" class="btn btn--yellow" id="jia-submit">Réserver ma place <span class="arw" aria-hidden="true">→</span></button>
+            <p class="enroll__note">Vous recevez tout de suite la facture par e-mail, avec le bulletin QR. Voir les <a href="mentions-legales.html" style="color:inherit;text-decoration:underline;">mentions légales</a>.</p>
+          </div>
+          <p class="fmsg" id="fmsg" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+
+    <template id="ok-template">
+      <div class="enroll eok">
+        <span class="bf">Place réservée</span>
+        <h3>Merci, c'est noté&nbsp;!</h3>
+        <p>Votre place pour le <strong data-slot="date"></strong> est réservée pendant 72 heures.</p>
+        <ul class="next">
+          <li><b>1</b><span>Vous recevez dans quelques minutes un e-mail avec la facture et son bulletin QR.</span></li>
+          <li><b>2</b><span>Votre place est confirmée à réception du paiement de CHF 600.–.</span></li>
+          <li><b>3</b><span>Vous recevez ensuite la confirmation et le rendez-vous à ajouter à votre agenda.</span></li>
+        </ul>
+        <p style="margin-top:1.6rem;font-size:.9rem;">Rien reçu d'ici une heure ? Regardez dans les indésirables, puis écrivez-moi à <a href="mailto:eve@agence-curcuma.ch" style="color:var(--yellow);">eve@agence-curcuma.ch</a>.</p>
+      </div>
+    </template>
+    <template id="ok-chom-template">
+      <div class="enroll eok">
+        <span class="bf">Place gardée</span>
+        <h3>Merci, c'est noté&nbsp;!</h3>
+        <p>Votre place pour le <strong data-slot="date"></strong> vous est gardée.</p>
+        <ul class="next">
+          <li><b>1</b><span>Vous recevez dans quelques minutes un e-mail avec la facture, à transmettre à votre caisse de chômage.</span></li>
+          <li><b>2</b><span>Votre place est confirmée dès que je reçois le courrier de l'ORP.</span></li>
+          <li><b>3</b><span>Vous recevez alors la confirmation et le rendez-vous à ajouter à votre agenda.</span></li>
+        </ul>
+      </div>
+    </template>
+    <template id="pre-template">
+      <div class="enroll eok">
+        <span class="bf">Pré-inscription</span>
+        <h3>Votre pré-inscription est enregistrée</h3>
+        <p>Pour le <strong data-slot="date"></strong>, en attendant la validation de l'ORP.</p>
+        <ul class="next">
+          <li><b>1</b><span>Vous recevez un e-mail récapitulatif dans quelques minutes. Aucune place n'est bloquée et aucun paiement n'est demandé.</span></li>
+          <li><b>2</b><span>Dès que l'ORP a validé la formation, je vous confirme votre place s'il en reste une, avec la facture pour votre caisse.</span></li>
+          <li><b>3</b><span>Si la date est complète, vous passez en liste d'attente ou sur une date suivante.</span></li>
+        </ul>
+      </div>
+    </template>
+    <template id="wait-template">
+      <div class="enroll eok">
+        <span class="bf">Liste d'attente</span>
+        <h3>Vous êtes sur la liste d'attente</h3>
+        <p>Les 4 places du <strong data-slot="date"></strong> sont prises pour l'instant.</p>
+        <ul class="next">
+          <li><b>1</b><span>Vous recevez un e-mail récapitulatif dans quelques minutes.</span></li>
+          <li><b>2</b><span>Si une place se libère, elle vous est attribuée dans l'ordre d'arrivée, avec la facture.</span></li>
+          <li><b>3</b><span>Aucun paiement ne vous est demandé d'ici là.</span></li>
+        </ul>
+      </div>
+    </template>
+  </div>
+</section>
+
+<!-- ============================ BRIDGE ============================ -->
+<section class="pad on-cream-2">
+  <div class="wrap">
+    <div class="bridge" data-a>
+      <span class="blob" style="width:240px;height:240px;top:-60px;right:-40px;opacity:.18;" aria-hidden="true"></span>
+      <div style="position:relative;z-index:2;">
+        <p class="kicker" style="color:var(--yellow);">Une question avant de vous inscrire ?</p>
+        <h2>Écrivez-moi, je vous <em>réponds</em></h2>
+        <p>Pour savoir si l'atelier correspond à ce que vous cherchez, ou pour une date en groupe.</p>
+      </div>
+      <div style="position:relative;z-index:2;"><a class="btn btn--yellow" href="mailto:eve@agence-curcuma.ch?subject=Atelier%20Exploration%20IA">M'écrire <span class="arw" aria-hidden="true">→</span></a></div>
+    </div>
+  </div>
+</section>
+</main>
+
+
+<footer class="ftr">
+  <div class="wrap">
+    <img src="curcuma-v2/images/logo-curcuma-yellow.png" alt="Agence Curcuma" width="500" height="150" loading="lazy" decoding="async" />
+    <p style="max-width:34ch;color:var(--cream-on-navy);margin-bottom:2rem;">Formations concrètes pour PME et indépendants de Suisse romande.</p>
+    <div class="ftr-bot">
+      <span>© <span id="yr"></span> Agence Curcuma — écouter, connecter, croître.</span>
+      <span>Jura · Suisse romande · <a href="index.html">Accueil</a> · <a href="conditions-generales.html">Conditions générales</a> · <a href="mentions-legales.html">Mentions légales</a></span>
+    </div>
+  </div>
+</footer> <button class="totop" id="totop" type="button" aria-label="Remonter en haut de la page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+
+<script>
+(function(){
+  var $=function(s,c){return (c||document).querySelector(s);};
+  var $$=function(s,c){return [].slice.call((c||document).querySelectorAll(s));};
+  var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Header + logo swap + burger */
+  var hdr=$('#hdr'),logo=$('#brand-logo'),burger=$('#burger'),nav=$('#nav'),totop=$('#totop');
+  var navOpen=false;
+
+  /* Logo jaune dès que le fond derrière lui est bleu marine : au défilement,
+     mais aussi quand le menu mobile est ouvert. */
+  function paintLogo(){
+    logo.src=(navOpen||window.scrollY>40)?'curcuma-v2/images/logo-curcuma-yellow.png':'curcuma-v2/images/logo-curcuma-navy.png';
+  }
+  function onScroll(){
+    if(totop)totop.classList.toggle('show',window.scrollY>400);
+    /* Menu ouvert : l'état du header est gelé. Sans ce garde-fou, le défilement
+       réintroduit la classe « scrolled » et son flou sous le menu ouvert. */
+    if(navOpen)return;
+    hdr.classList.toggle('scrolled',window.scrollY>40);
+    paintLogo();
+  }
+  function setNav(open){
+    if(open===navOpen)return;
+    navOpen=open;
+    nav.classList.toggle('open',open);
+    hdr.classList.toggle('nav-open',open);
+    document.documentElement.classList.toggle('nav-lock',open);
+    document.body.classList.toggle('nav-lock',open);
+    burger.setAttribute('aria-expanded',String(open));
+    if(open)paintLogo(); else onScroll();
+  }
+  if(totop)totop.addEventListener('click',function(){window.scrollTo({top:0,behavior:reduced?'auto':'smooth'});});
+  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+  burger.addEventListener('click',function(){setNav(!navOpen);});
+  nav.addEventListener('click',function(e){if(e.target.closest('a'))setNav(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&navOpen)setNav(false);});
+  $('#yr').textContent=new Date().getFullYear();
+
+  /* Accordéons du programme */
+  $$('#days .day').forEach(function(day){
+    var t=$('.day__t',day),p=$('.day__p',day);
+    p.style.maxHeight=day.classList.contains('is-open')?p.scrollHeight+'px':'0px';
+    t.addEventListener('click',function(){var o=day.classList.toggle('is-open');t.setAttribute('aria-expanded',String(o));p.style.maxHeight=o?p.scrollHeight+'px':'0px';});
+  });
+  window.addEventListener('resize',function(){$$('#days .day.is-open .day__p').forEach(function(p){p.style.maxHeight=p.scrollHeight+'px';});});
+
+  /* ==================================================================
+     INSCRIPTION — Google Apps Script (curcuma-v2/apps-script-atelier-exploration-ia)
+
+     ⚠️  Coller ci-dessous l'URL du Web App (elle finit par « /exec »).
+     Les dates doivent correspondre à CONFIG.SESSIONS dans Code.gs.
+     ================================================================== */
+  var GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwAXp1R5fCBZRwH2n7OtUPUIjytQgtq_wneY2rAUHhgyf_NwvmOfAWinV6m7hBPf27q9Q/exec';
+
+  var form=$('#jia-form'),zone=$('#enroll-zone'),msg=$('#fmsg'),btn=$('#jia-submit');
+  var etat={};            /* état des places par session, renvoyé par le backend */
+  var LABEL_RESA='Réserver ma place <span class="arw" aria-hidden="true">→</span>';
+  var LABEL_ATT='M\'inscrire en liste d\'attente <span class="arw" aria-hidden="true">→</span>';
+  var raccorde=!/COLLER_ICI/.test(GAS_ENDPOINT);
+
+  function cartes(){return $$('.dcard',form);}
+  function choisie(){var r=$('input[name="session"]:checked',form);return r?r.value:'';}
+  function majBouton(){
+    if(!btn||btn.disabled)return;
+    var e=etat[choisie()];
+    if(typeof preinscr==='function'&&preinscr()){btn.innerHTML='Me pré-inscrire <span class="arw" aria-hidden="true">→</span>';return;}
+    btn.innerHTML=(e&&e.liste_attente)?LABEL_ATT:LABEL_RESA;
+  }
+  function afficherEtat(){
+    cartes().forEach(function(c){
+      var inp=$('input',c),e=etat[inp.value],s=$('.dcard__s',c);
+      c.classList.remove('is-few','is-wait','is-closed');
+      if(!e){s.textContent='';return;}
+      if(!e.ouverte){c.classList.add('is-closed');inp.disabled=true;inp.checked=false;s.textContent=e.annulee?'Date annulée':'Inscriptions fermées';return;}
+      if(e.complet){c.classList.add('is-wait');s.textContent='Complet · liste d\'attente';return;}
+      if(e.liste_attente){c.classList.add('is-wait');s.textContent='Liste d\'attente ouverte';return;}
+      var n=e.places_restantes;
+      if(n<=2)c.classList.add('is-few');
+      s.textContent=n===1?'Plus qu\'une place':(n+' places sur 4');
+    });
+    if(!choisie()){var libre=cartes().map(function(c){return $('input',c);}).filter(function(i){return !i.disabled;})[0];if(libre)libre.checked=true;}
+    majBouton();
+  }
+  cartes().forEach(function(c){$('input',c).addEventListener('change',majBouton);});
+  var chom=$('#chom'),chk=$('#chomage'),chomN=$('#chom-n');
+  function orp(){var r=$('input[name="validation_orp"]:checked',form);return chk.checked?(r?r.value:''):'';}
+  function preinscr(){return chk.checked&&orp()==='pas encore';}
+  function majChom(){chom.classList.toggle('is-on',chk.checked);chomN.hidden=!preinscr();majBouton();}
+  chk.addEventListener('change',function(){majChom();if(chk.checked)$('#caisse').focus();});
+  $$('input[name="validation_orp"]',form).forEach(function(i){i.addEventListener('change',majChom);});
+  if(raccorde){
+    fetch(GAS_ENDPOINT,{method:'GET',redirect:'follow'}).then(function(r){return r.json();}).then(function(res){
+      if(res&&res.sessions){res.sessions.forEach(function(s){etat[s.id]=s;});afficherEtat();}
+    }).catch(function(){});
+  }
+
+  function showTpl(id,dateTxt){
+    var tpl=$(id);if(!tpl)return;
+    zone.innerHTML='';zone.appendChild(tpl.content.cloneNode(true));
+    $$('[data-slot="date"]',zone).forEach(function(el){el.textContent=dateTxt;});
+    zone.scrollIntoView({behavior:reduced?'auto':'smooth',block:'center'});
+  }
+  var sending=false;
+  function fail(txt){
+    sending=false;
+    if(btn){btn.disabled=false;btn.removeAttribute('aria-busy');}majBouton();
+    msg.className='fmsg err';
+    msg.innerHTML=(txt||'Une erreur est survenue.')+' Écrivez-moi à <a href="mailto:eve@agence-curcuma.ch?subject=Inscription%20Journ%C3%A9e%20IA" style="color:inherit;text-decoration:underline;">eve@agence-curcuma.ch</a>.';
+  }
+
+  form.addEventListener('submit',function(e){
+    e.preventDefault();if(sending)return;
+    msg.className='fmsg';msg.textContent='';
+    var v=function(id){var el=$('#'+id,form);return el?el.value.trim():'';};
+    if(v('site-web')){showTpl('#ok-template','');return;}
+    var session=choisie(),carte=session?$('input[value="'+session+'"]',form).closest('.dcard'):null;
+    if(!session){msg.classList.add('err');msg.textContent='Merci de choisir une date.';return;}
+    var manque=['prenom','nom','email','rue','npa','localite'].filter(function(id){return !v(id);});
+    if(manque.length||!/^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/.test(v('email'))){
+      msg.classList.add('err');
+      msg.textContent=manque.length?'Merci de compléter vos coordonnées : elles figurent sur la facture.':'Merci de vérifier votre adresse e-mail.';
+      $('#'+(manque[0]||'email'),form).focus();return;
+    }
+    if(chk.checked&&!v('caisse')){msg.classList.add('err');msg.textContent='Merci d\'indiquer votre caisse de chômage.';$('#caisse').focus();return;}
+    if(chk.checked&&!orp()){msg.classList.add('err');msg.textContent='Merci d\'indiquer si l\'ORP a déjà validé la formation.';return;}
+    if(!$('#cgv',form).checked){msg.classList.add('err');msg.textContent='Merci d\'accepter les conditions pour continuer.';$('#cgv',form).focus();return;}
+    if(!raccorde){fail('Les inscriptions en ligne ouvrent très bientôt.');return;}
+
+    sending=true;btn.disabled=true;btn.setAttribute('aria-busy','true');btn.textContent='Envoi en cours…';
+    var dateTxt=$('.dcard__t',carte).textContent;dateTxt=dateTxt.charAt(0).toLowerCase()+dateTxt.slice(1);
+    var timedOut=false,guard=setTimeout(function(){timedOut=true;fail('L\'envoi n\'a pas abouti (connexion lente ou bloquée).');},25000);
+    fetch(GAS_ENDPOINT,{method:'POST',mode:'cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({session:session,prenom:v('prenom'),nom:v('nom'),email:v('email'),rue:v('rue'),npa:v('npa'),localite:v('localite'),
+        attentes:v('attentes'),chomage:chk.checked?'oui':'non',caisse:chk.checked?v('caisse'):'',
+        validation_orp:orp(),newsletter:$('#newsletter',form).checked?'oui':'non',consentement:'oui',site_web:''})})
+    .then(function(r){return r.json();})
+    .then(function(res){
+      if(timedOut)return;clearTimeout(guard);
+      if(res&&res.status==='INSCRIT'){showTpl(chk.checked?'#ok-chom-template':'#ok-template',dateTxt);return;}
+      if(res&&res.status==='LISTE_ATTENTE'){showTpl('#wait-template',dateTxt);return;}
+      if(res&&res.status==='PREINSCRIT'){showTpl('#pre-template',dateTxt);return;}
+      if(res&&res.status==='DOUBLON'){sending=false;btn.disabled=false;btn.removeAttribute('aria-busy');majBouton();
+        msg.className='fmsg ok';msg.textContent='Cette adresse est déjà inscrite à cette date. Regardez dans votre boîte de réception (et les indésirables).';return;}
+      fail(res&&res.message);
+    })
+    .catch(function(){if(timedOut)return;clearTimeout(guard);fail('Une erreur est survenue.');});
+  });
+
+  /* Animations scroll globales */
+  var els=$$('[data-a]');
+  if(!('IntersectionObserver' in window)||reduced){els.forEach(function(el){el.classList.add('vis');});}
+  else{var io=new IntersectionObserver(function(en){en.forEach(function(e){if(e.isIntersecting){e.target.classList.add('vis');io.unobserve(e.target);}});},{threshold:.12,rootMargin:'0px 0px -8% 0px'});els.forEach(function(el){io.observe(el);});}
+})();
+</script>
+</body>
+</html>
