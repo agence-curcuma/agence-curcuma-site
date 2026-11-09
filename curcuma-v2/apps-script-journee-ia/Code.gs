@@ -523,7 +523,7 @@ function emailFacture_(l, s, echeance, pdf, promotion) {
         montantTexte_() + '.\n\n' +
         'Vous trouverez la facture en pièce jointe. Le bulletin QR en bas de page se scanne directement avec l\'application de votre banque.\n\n' +
         'Sans paiement à cette date, la place est proposée à la personne suivante et votre inscription passe en liste d\'attente.\n\n') +
-    'À prévoir pour la journée : un abonnement Claude Pro (environ 20 CHF par mois). Le repas de midi, les boissons et les cafés sont offerts.\n\n' +
+    'À prévoir pour la journée : votre ordinateur portable et un abonnement Claude Pro (environ 20 CHF par mois). Le repas de midi, les boissons et les cafés sont offerts.\n\n' +
     'Une question ? Répondez simplement à cet e-mail.\n\n' +
     'À bientôt,\nEve Schaller\nAgence Curcuma';
   envoyer_(l.email,
@@ -538,7 +538,7 @@ function emailConfirmation_(l, s, facture) {
     infosPratiques_(s) + '\n\n' +
     'Le fichier joint ajoute la journée à votre agenda.\n\n' +
     (facture ? 'Vous trouverez aussi la facture, à transmettre à votre caisse de chômage.\n\n' : '') +
-    'À prévoir : votre abonnement Claude Pro actif (environ 20 CHF par mois). ' +
+    'À prévoir : votre ordinateur portable et votre abonnement Claude Pro actif (environ 20 CHF par mois). ' +
     'Le repas de midi, les boissons et les cafés sont offerts. Vous repartez avec une attestation de participation.\n\n' +
     'Je vous envoie les dernières informations pratiques quelques jours avant.\n\n' +
     'À bientôt,\nEve Schaller\nAgence Curcuma';
@@ -663,7 +663,7 @@ function icsBlob_(s) {
     'DESCRIPTION:Repas de midi\\, boissons et cafés offerts. À prévoir : abonnement Claude Pro actif. Contact : ' + CONFIG.ADMIN_EMAIL,
     'END:VEVENT', 'END:VCALENDAR'
   ].join('\r\n');
-  return Utilities.newBlob(ics, 'text/calendar', 'journee-ia.ics');
+  return Utilities.newBlob(ics, 'text/calendar', 'atelier-exploration-ia.ics');
 }
 
 
