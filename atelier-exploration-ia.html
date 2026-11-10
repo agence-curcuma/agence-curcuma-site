@@ -596,7 +596,10 @@ h2 em{font-weight:500;}
             <div class="fld fld--full"><label for="rue">Rue et n°</label><input id="rue" name="rue" type="text" autocomplete="street-address" required placeholder="Rue du Moulin 12" /></div>
             <div class="fld"><label for="npa">NPA</label><input id="npa" name="npa" type="text" inputmode="numeric" autocomplete="postal-code" required placeholder="2800" /></div>
             <div class="fld"><label for="localite">Localité</label><input id="localite" name="localite" type="text" autocomplete="address-level2" required placeholder="Delémont" /></div>
-            <div class="fld fld--full"><label for="attentes">Une tâche typique de votre métier que l'IA pourrait faciliter (facultatif)</label><textarea id="attentes" name="attentes" rows="3" placeholder="Votre secteur d'activité, une tâche qui prend du temps, une idée, une question…"></textarea></div>
+            <div class="fld"><label for="poste">Poste ou métier</label><input id="poste" name="poste" type="text" autocomplete="organization-title" required placeholder="Assistante de direction" /></div>
+            <div class="fld"><label for="secteur">Secteur d'activité</label><input id="secteur" name="secteur" type="text" required placeholder="Santé, industrie, commerce…" /></div>
+            <div class="fld fld--full"><label for="entreprise">Entreprise (facultatif)</label><input id="entreprise" name="entreprise" type="text" autocomplete="organization" placeholder="Nom de l'entreprise, si vous en avez une" /></div>
+            <div class="fld fld--full"><label for="attentes">Une tâche typique de votre métier que l'IA pourrait faciliter (facultatif)</label><textarea id="attentes" name="attentes" rows="3" placeholder="Une tâche qui prend du temps, une idée, une question…"></textarea></div>
             <div class="chom" id="chom">
               <label class="consent" for="chomage">
                 <input type="checkbox" id="chomage" name="chomage" value="oui" />
@@ -841,6 +844,8 @@ h2 em{font-weight:500;}
       msg.textContent=manque.length?'Merci de compléter vos coordonnées : elles figurent sur la facture.':'Merci de vérifier votre adresse e-mail.';
       $('#'+(manque[0]||'email'),form).focus();return;
     }
+    var manque2=['poste','secteur'].filter(function(id){return !v(id);});
+    if(manque2.length){msg.classList.add('err');msg.textContent='Merci d\'indiquer votre poste ou métier et votre secteur d\'activité : ils m\'aident à préparer l\'après-midi.';$('#'+manque2[0],form).focus();return;}
     if(chk.checked&&!v('caisse')){msg.classList.add('err');msg.textContent='Merci d\'indiquer votre caisse de chômage.';$('#caisse').focus();return;}
     if(chk.checked&&!orp()){msg.classList.add('err');msg.textContent='Merci d\'indiquer si l\'ORP a déjà validé la formation.';return;}
     if(!$('#cgv',form).checked){msg.classList.add('err');msg.textContent='Merci d\'accepter les conditions pour continuer.';$('#cgv',form).focus();return;}
@@ -851,7 +856,7 @@ h2 em{font-weight:500;}
     var timedOut=false,guard=setTimeout(function(){timedOut=true;fail('L\'envoi n\'a pas abouti (connexion lente ou bloquée).');},25000);
     fetch(GAS_ENDPOINT,{method:'POST',mode:'cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},
       body:JSON.stringify({session:session,prenom:v('prenom'),nom:v('nom'),email:v('email'),rue:v('rue'),npa:v('npa'),localite:v('localite'),
-        attentes:v('attentes'),chomage:chk.checked?'oui':'non',caisse:chk.checked?v('caisse'):'',
+        attentes:v('attentes'),entreprise:v('entreprise'),secteur:v('secteur'),poste:v('poste'),chomage:chk.checked?'oui':'non',caisse:chk.checked?v('caisse'):'',
         validation_orp:orp(),newsletter:$('#newsletter',form).checked?'oui':'non',consentement:'oui',site_web:''})})
     .then(function(r){return r.json();})
     .then(function(res){

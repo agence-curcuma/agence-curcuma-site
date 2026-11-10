@@ -94,14 +94,16 @@ var COL = {
   RUE: 7, NPA: 8, LOCALITE: 9, ATTENTES: 10, NEWSLETTER: 11, CONSENTEMENT: 12,
   CHOMAGE: 13, CAISSE: 14, VALIDATION_ORP: 15,
   STATUT: 16, RESERVEE_JUSQU: 17, PAIEMENT_RECU: 18, DATE_PAIEMENT: 19,
-  FACTURE: 20, CONFIRM_ENVOYEE: 21, ENTREE_ATTENTE: 22, NOTES: 23, HISTORIQUE: 24, CODE: 25
+  FACTURE: 20, CONFIRM_ENVOYEE: 21, ENTREE_ATTENTE: 22, NOTES: 23, HISTORIQUE: 24, CODE: 25,
+  ENTREPRISE: 26, SECTEUR: 27, POSTE: 28
 };
 var HEADERS = [
   "Date d'inscription", 'Session', 'Date du cours', 'Prénom', 'Nom', 'E-mail',
   'Rue et n°', 'NPA', 'Localité', 'Ce que la personne aimerait faire', 'Newsletter', 'Conditions acceptées',
   'Via le chômage', 'Caisse de chômage', 'ORP : formation déjà validée ?',
   'Statut', "Réservée jusqu'au", 'Paiement reçu', 'Date de paiement', 'N° de facture',
-  'Confirmation envoyée', "Entrée en liste d'attente", 'Notes', 'Historique', 'Code de réactivation'
+  'Confirmation envoyée', "Entrée en liste d'attente", 'Notes', 'Historique', 'Code de réactivation',
+  'Entreprise', "Secteur d'activité", 'Poste ou métier'
 ];
 var LAST_COL = HEADERS.length;
 
@@ -155,6 +157,9 @@ function doPost(e) {
       npa       : nettoyer_(data.npa, 16),
       localite  : nettoyer_(data.localite, 35),
       attentes  : nettoyer_(data.attentes, 2000),
+      entreprise: nettoyer_(data.entreprise, 100),
+      secteur   : nettoyer_(data.secteur, 100),
+      poste     : nettoyer_(data.poste, 100),
       newsletter: estCoche_(data.newsletter) ? 'oui' : 'non',
       consentement: estCoche_(data.consentement) ? 'oui' : 'non',
       chomage   : estCoche_(data.chomage) ? 'oui' : 'non',
@@ -989,6 +994,7 @@ function resumeAdmin_(p, s, statut, actives, ligne) {
     'Date : ' + s.label, 'Statut : ' + statut, 'Ligne : ' + ligne, '',
     p.prenom + ' ' + p.nom + ' <' + p.email + '>',
     p.rue + ', ' + p.npa + ' ' + p.localite,
+    'Poste ou métier : ' + (p.poste || '—') + ' / Secteur : ' + (p.secteur || '—') + (p.entreprise ? ' / Entreprise : ' + p.entreprise : ''),
     p.chomage === 'oui' ? 'VIA LE CHÔMAGE — caisse : ' + p.caisse + ' — ORP a déjà validé : ' + (p.validation || '?') +
       (p.validation === 'oui' ? '\n→ place gardée sans délai ; mets PRISE_EN_CHARGE à réception du courrier de l\'ORP.'
         : '\n→ PRÉ-INSCRIPTION : aucune place bloquée. À réception de la validation de l\'ORP, mets PRISE_EN_CHARGE : la place est confirmée si elle est libre (facture jointe), sinon liste d\'attente.')
@@ -1392,6 +1398,8 @@ function ecrireInscription_(sh, p, s, statut) {
     statut === ST.ATTENTE ? maintenant : '', '', horodate_(maintenant) + ' — inscription : ' + statut
   ]);
   var r = sh.getLastRow();
+  if (!sh.getRange(1, COL.ENTREPRISE).getValue()) sh.getRange(1, 1, 1, LAST_COL).setValues([HEADERS]).setFontWeight('bold');
+  sh.getRange(r, COL.ENTREPRISE, 1, 3).setValues([[p.entreprise || '', p.secteur || '', p.poste || '']]);
   sh.getRange(r, COL.PAIEMENT_RECU).insertCheckboxes();
   sh.getRange(r, COL.CONFIRM_ENVOYEE).insertCheckboxes();
   SpreadsheetApp.flush();
